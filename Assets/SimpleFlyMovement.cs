@@ -31,8 +31,8 @@ public class SimpleFlyMovement : MonoBehaviour
             mousePos = Input.mousePosition;
         } else if (Input.GetMouseButton(0)) {
             Vector3 mouseDelta = Input.mousePosition - mousePos;
-            transform.RotateAround(Vector3.up, -mouseDelta.x * rotateSpeed * Time.deltaTime);
-            transform.RotateAround(transform.right, mouseDelta.y * rotateSpeed * Time.deltaTime);
+            transform.RotateAround(transform.position, Vector3.up, -mouseDelta.x * rotateSpeed * Time.deltaTime);
+            transform.RotateAround(transform.position, transform.right, mouseDelta.y * rotateSpeed * Time.deltaTime);
             mousePos = Input.mousePosition;
         }
     }
