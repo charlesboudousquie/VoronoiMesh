@@ -1,0 +1,31 @@
+basic list of tasks for this project:
+{items in curly brackets are stretch goals}
+
+player
+  implement basic movement: grabbing anywhere grabs the mesh and translates it without rotating
+  make player position and focus available to other scripts... somehow
+
+navmesh (start with a box or something small)
+  decide on navmesh data structure: linked nodes?
+    Node has
+      three neighbour pointers
+      position
+      normal direction
+  read mesh into navmesh data structure
+  implement algorithm to determine a navmesh node's...
+    proximity to player
+    visibility to player
+
+agents (start with spheres)
+  make agent
+  implement 'MoveTo(vec3 destination)' function (VERY basic move in a straight line through space from current position to destination)
+  implement 'FollowPath(list of vec3)' (carry out a list of MoveTos)
+  implement path finding algorithm that outputs list of locations for FollowPath
+  implement basic tiered behaviour architecture
+  assign proximity-based behaviours in architecture
+    distance 4: move randomly
+    {distance 3: stop and look at player}
+    distance 2: move away from player until obscured
+    {distance 1: fly away from player}
+  {implement rotational correctness (agent stays aligned with the normal of the surface, and faces the direction of movement)}
+  {implement agent-agent avoidance}
