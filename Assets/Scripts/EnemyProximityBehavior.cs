@@ -99,16 +99,16 @@ public class EnemyProximityBehavior : MonoBehaviour
 
         // draw debug lines
         Debug.DrawLine(ourPos, ourPos + debugDirection * 20.0f, Color.green);
-        Handles.Label(ourPos + debugDirection * 20.0f, "Distance 20");
+        //Handles.Label(ourPos + debugDirection * 20.0f, "Distance 20");
 
         Debug.DrawLine(ourPos, ourPos + debugDirection * 15.0f, Color.red);
-        Handles.Label(ourPos + debugDirection * 15.0f, "Distance 15");
+        //Handles.Label(ourPos + debugDirection * 15.0f, "Distance 15");
 
         Debug.DrawLine(ourPos, ourPos + debugDirection * 10.0f, Color.blue);
-        Handles.Label(ourPos + debugDirection * 10.0f, "Distance 10");
+        //Handles.Label(ourPos + debugDirection * 10.0f, "Distance 10");
 
         Debug.DrawLine(ourPos, ourPos + debugDirection * 5.0f, Color.white);
-        Handles.Label(ourPos + debugDirection * 5.0f, "Distance 5");
+        //Handles.Label(ourPos + debugDirection * 5.0f, "Distance 5");
 
         timer += Time.deltaTime;
         //int shaderID = rend.material.shader.GetInstanceID();
@@ -131,13 +131,13 @@ public class EnemyProximityBehavior : MonoBehaviour
             // if too far away dont move
             if (distance >= 20.0f)
             {
-                Handles.Label(ourPos, "Doing Nothing");
+                //Handles.Label(ourPos, "Doing Nothing");
 
                 targetPosition = this.transform.position;
             }
             else if (distance >= 15.0f)
             {
-                Handles.Label(ourPos, "Moving Randomly");
+                //Handles.Label(ourPos, "Moving Randomly");
 
                 if (timer > 2.0f)
                 {
@@ -147,17 +147,17 @@ public class EnemyProximityBehavior : MonoBehaviour
             }
             else if (distance >= 10.0f)
             {
-                Handles.Label(ourPos, "Looking At Player");
+                //Handles.Label(ourPos, "Looking At Player");
                 StopAndLookAtPlayer();
             }
             else if (distance >= 5.0f)
             {
-                Handles.Label(ourPos, "Moving From Player Until Hidden");
+                //Handles.Label(ourPos, "Moving From Player Until Hidden");
 
             }
             else
             {
-                Handles.Label(ourPos, "Flying away from Player");
+                //Handles.Label(ourPos, "Flying away from Player");
 
                 FlyAwayFromPlayer();
             }
