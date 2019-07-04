@@ -273,7 +273,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   thrustSpeed: 2
   strafeSpeed: 2
-  rotateSpeed: 0.1
+  rotateSpeed: 1
 --- !u!1 &464695798
 GameObject:
   m_ObjectHideFlags: 0
