@@ -34,10 +34,10 @@ public class HardCodedSample : MonoBehaviour
         mesh.RecalculateNormals();
 
 
-        rootNode = new VoronoiNode();
-        VoronoiNode n1 = new VoronoiNode();
-        VoronoiNode n2 = new VoronoiNode();
-        VoronoiNode n3 = new VoronoiNode();
+        rootNode = new VoronoiNode(0);
+        VoronoiNode n1 = new VoronoiNode(1);
+        VoronoiNode n2 = new VoronoiNode(2);
+        VoronoiNode n3 = new VoronoiNode(3);
 
         rootNode.Start();
         n1.Start();
