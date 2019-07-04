@@ -53,8 +53,8 @@ public class NodeHeap
         VoronoiNode tNode = nodeHeap[i];
         nodeHeap[i] = nodeHeap[j];
         nodeHeap[j] = tNode;
-        //locationMap[nodeHeap[j].Id] = j;
-        //locationMap[nodeHeap[i].Id] = i;
+        locationMap[nodeHeap[j].Id] = j;
+        locationMap[nodeHeap[i].Id] = i;
     }
 
     void TrickleDown(int i) {
@@ -95,7 +95,7 @@ public class NodeHeap
 
     bool NodeLT(VoronoiNode a, VoronoiNode b) {
         return false;
-        //return (a.Cost < b.Cost);
+        return (a.Cost < b.Cost);
     }
 
 }

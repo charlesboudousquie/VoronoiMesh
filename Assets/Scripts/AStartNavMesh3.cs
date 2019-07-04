@@ -34,13 +34,10 @@ public class AStartNavMesh3 : MonoBehaviour
         openHeap.Push(s);
         //start.Open = true;
 
-        /*
+        
         while (!openHeap.IsEmpty()) {
 
             VoronoiNode least = openHeap.Pop();
-
-            lx = least->x();
-            ly = least->y();
 
             if (least.Id == end.Id) {
                 //celebrate: push stuff onto solution path and return success
@@ -52,34 +49,32 @@ public class AStartNavMesh3 : MonoBehaviour
                 return path;
             }
 
-            least->SetClosed();
-            if (request.settings.debugColoring) terrain->set_color(ly, lx, Colors::Blue);
-            nbrList = least->GetNeighbors();
+            least.Open = false;
+            //if (request.settings.debugColoring) terrain->set_color(ly, lx, Colors::Blue);
 
-            for (int i = 0; i < 8; i++) {
-                if (!(nbrList & (0b00000001 << i))) continue;
-                nbr = getNodeFromInt(i, lx, ly);
-                if (nbr->OnOpen()) {
-                    if (nbr->GetGivenS() - (least->GetGivenS() + costS[i]) > (least->GetGivenD() + costD[i] - nbr->GetGivenD()) * 1.141) {
-                        nbr->Open(least, costS[i], costD[i]);
-                        openHeap.UpdateNode(nbr->x(), nbr->y());
+            for (int i = 0; i < 3; i++) {
+                VoronoiNode nbr = least.neighbors[i];
+                if (nbr.Open) {
+                    float DistToNbr = Vector3.Distance(nbr, least);
+                    if (nbr.Given > least.Given + DistToNbr) {
+                        nbr.Parent = least;
+                        nbr.Cost = least.Cost + DistToNbr;
+                        openHeap.UpdateNode(nbr.Id);
                     }
-                } else if (!nbr->OnClosed()) {
-                    nx = nbr->x();
-                    ny = nbr->y();
-                    nbr->Open(least, costS[i], costD[i]);
-                    SetHeuristic(nbr, std::abs(goal.col - nx), std::abs(goal.row - ny), request.settings.heuristic);
+                } else if (!nbr.Closed) {
+                    nbr.Parent = least;
+                    nbr.Open = true;
+                    nbr.Heuristic = Vector3.Distance(nbr.Position - end.Position);
+                    nbr.Cost = least.Cost + Vector3.Distance(nbr, least);
                     openHeap.Push(nbr);
-                    if (request.settings.debugColoring) terrain->set_color(ny, nx, Colors::Yellow);
+                    //if (request.settings.debugColoring) terrain->set_color(ny, nx, Colors::Yellow);
                 }
             }
-            if (request.settings.singleStep) return PathResult::PROCESSING;
+            //if (request.settings.singleStep) return PathResult::PROCESSING;
         }
         //handle error: no path exists
-        return PathResult::IMPOSSIBLE;
-        */
-
-
+        //return PathResult::IMPOSSIBLE;
+        
         return path;
     }
 }
