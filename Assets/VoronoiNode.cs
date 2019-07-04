@@ -10,15 +10,30 @@ public class VoronoiNode
     private Vector3 normal;
     private Vector3 position;
     int numVerts, numNeighbors;
+    public int Id { get; }
     public float Cost;
     public float Hueristic;//recommend Euclidean distance
+    public bool Open;
+    public bool Closed;
+    public VoronoiNode(int _id)
+    {
+        Id = _id;
+    }
     // Start is called before the first frame update
     public void Start()
     {
+        Open = Closed = false;
+        Cost = Hueristic = 0;
         neighbors = new VoronoiNode[3];
         vertices = new Vector3[3];
         numVerts = 0;
         numNeighbors = 0;
+    }
+
+    public void Reset()
+    {
+        Open = Closed = false;
+        Cost = Hueristic = 0;
     }
 
     public VoronoiNode[] GetNeighbors() {
