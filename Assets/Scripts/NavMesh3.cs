@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class NavMesh3 : MonoBehaviour
 {
-    public VoronoiNode[] nodes { get; }
+    public VoronoiNode[] nodes;
 
     void Start()
     {
@@ -13,8 +13,9 @@ public class NavMesh3 : MonoBehaviour
         MeshFilter mf = GetComponent<MeshFilter>();
         Mesh mesh = mf.mesh;
         int size = mesh.triangles.Length/3;//always divisiable by 3
-       
-        for(int i = 0; i < size; ++i)
+        nodes = new VoronoiNode[size];
+
+        for (int i = 0; i < size; ++i)
         {
             VoronoiNode v = new VoronoiNode(i);
             Vector3 normals = new Vector3(0, 0, 0);

@@ -5,12 +5,12 @@ using UnityEngine;
 public class AStartNavMesh3 : MonoBehaviour
 {
     NodeHeap openHeap;
+    public NavMesh3 navMesh;
 
     // Start is called before the first frame update
     void Start()
     {
-        VoronoiNode[] list = new VoronoiNode[1];
-        openHeap.InitHeap(list);
+        openHeap.InitHeap(navMesh.nodes);
     }
 
     // Update is called once per frame
@@ -22,17 +22,16 @@ public class AStartNavMesh3 : MonoBehaviour
     public List<Vector3> GetPath(VoronoiNode start, VoronoiNode end) {
         List<Vector3> path = new List<Vector3>();
 
-        int numNodes = 0;
+        int numNodes = navMesh.nodes.Length;
         for (int i = 0; i < numNodes; i++) {
-            //reset all nodes somehow
+            navMesh.nodes[i].Reset();
         }
         
         openHeap.ResetHeap();
 
-        //int s = start.Id;
-        int s = 0;
+        int s = start.Id;
         openHeap.Push(s);
-        //start.Open = true;
+        start.Open = true;
 
         
         while (!openHeap.IsEmpty()) {
@@ -42,31 +41,31 @@ public class AStartNavMesh3 : MonoBehaviour
             if (least.Id == end.Id) {
                 //celebrate: push stuff onto solution path and return success
                 while (least.Id != start.Id) {
-                    path.Add(least.position);
-                    least = least.parent;
+                    path.Add(least.Position);
+                    least = navMesh.nodes[least.Parent];
                 }
-                path.Add(start.position);
+                path.Add(start.Position);
                 return path;
             }
 
             least.Open = false;
             //if (request.settings.debugColoring) terrain->set_color(ly, lx, Colors::Blue);
-
+            int[] neighbors = least.GetNeighbors();
             for (int i = 0; i < 3; i++) {
-                VoronoiNode nbr = least.neighbors[i];
+                VoronoiNode nbr = navMesh.nodes[neighbors[i]];
                 if (nbr.Open) {
-                    float DistToNbr = Vector3.Distance(nbr, least);
+                    float DistToNbr = Vector3.Distance(nbr.Position, least.Position);
                     if (nbr.Given > least.Given + DistToNbr) {
-                        nbr.Parent = least;
+                        nbr.Parent = least.Id;
                         nbr.Cost = least.Cost + DistToNbr;
                         openHeap.UpdateNode(nbr.Id);
                     }
                 } else if (!nbr.Closed) {
-                    nbr.Parent = least;
+                    nbr.Parent = least.Id;
                     nbr.Open = true;
-                    nbr.Heuristic = Vector3.Distance(nbr.Position - end.Position);
-                    nbr.Cost = least.Cost + Vector3.Distance(nbr, least);
-                    openHeap.Push(nbr);
+                    nbr.Hueristic = Vector3.Distance(nbr.Position, end.Position);
+                    nbr.Cost = least.Cost + Vector3.Distance(nbr.Position, least.Position);
+                    openHeap.Push(nbr.Id);
                     //if (request.settings.debugColoring) terrain->set_color(ny, nx, Colors::Yellow);
                 }
             }

@@ -94,7 +94,6 @@ public class NodeHeap
     }
 
     bool NodeLT(VoronoiNode a, VoronoiNode b) {
-        return false;
         return (a.Cost < b.Cost);
     }
 
