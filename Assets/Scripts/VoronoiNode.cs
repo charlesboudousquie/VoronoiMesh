@@ -7,7 +7,7 @@ public class VoronoiNode
 
     private int[] neighbors;
     private Vector3[] vertices;
-    private Vector3 normal;
+    public Vector3 normal;
     public Vector3 Position { get; set; }
     int numVerts, numNeighbors;
     public int Id { get; }
@@ -55,7 +55,7 @@ public class VoronoiNode
     }
 
     public void SetNormal(Vector3 n) {
-        normal = n;
+        normal = n.normalized;
     }
 
 
