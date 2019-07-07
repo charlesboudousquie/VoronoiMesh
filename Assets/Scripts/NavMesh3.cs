@@ -54,8 +54,8 @@ public class NavMesh3 : MonoBehaviour
                 }
             }
         }
-        
 
+        BroadcastMessage("OnMapReset");
     }
 
     void Update()
