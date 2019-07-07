@@ -27,10 +27,7 @@ public class VoronoiNode
         vertices = new Vector3[3];
         numVerts = 0;
         numNeighbors = 0;
-    }
-    // Start is called before the first frame update
-    public void Start()
-    {
+        MatchingVertices = new Dictionary<int, List<Vector3>>();
     }
 
     public void Reset()
