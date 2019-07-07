@@ -20,16 +20,16 @@ public class VoronoiNode
     public VoronoiNode(int _id)
     {
         Id = _id;
-    }
-    // Start is called before the first frame update
-    public void Start()
-    {
         Open = Closed = false;
         Cost = Hueristic = Given = 0;
         neighbors = new int[3];
         vertices = new Vector3[3];
         numVerts = 0;
         numNeighbors = 0;
+    }
+    // Start is called before the first frame update
+    public void Start()
+    {
     }
 
     public void Reset()

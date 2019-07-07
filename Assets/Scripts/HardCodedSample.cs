@@ -47,30 +47,30 @@ public class HardCodedSample : MonoBehaviour
         rootNode.AddPoint(vertices[0]);
         rootNode.AddPoint(vertices[1]);
         rootNode.AddPoint(vertices[2]);
-        rootNode.AddNeighbor(ref n1);
-        rootNode.AddNeighbor(ref n2);
-        rootNode.AddNeighbor(ref n3);
+        rootNode.AddNeighbor(n1);
+        rootNode.AddNeighbor(n2);
+        rootNode.AddNeighbor(n3);
 
         n1.AddPoint(vertices[1]);
         n1.AddPoint(vertices[0]);
         n1.AddPoint(vertices[3]);
-        n1.AddNeighbor(ref rootNode);
-        n1.AddNeighbor(ref n2);
-        n1.AddNeighbor(ref n3);
+        n1.AddNeighbor(rootNode);
+        n1.AddNeighbor(n2);
+        n1.AddNeighbor(n3);
 
         n2.AddPoint(vertices[0]);
         n2.AddPoint(vertices[2]);
         n2.AddPoint(vertices[3]);
-        n2.AddNeighbor(ref n1);
-        n2.AddNeighbor(ref rootNode);
-        n2.AddNeighbor(ref n3);
+        n2.AddNeighbor(n1);
+        n2.AddNeighbor(rootNode);
+        n2.AddNeighbor(n3);
 
         n3.AddPoint(vertices[2]);
         n3.AddPoint(vertices[1]);
         n3.AddPoint(vertices[3]);
-        n3.AddNeighbor(ref n1);
-        n3.AddNeighbor(ref n2);
-        n3.AddNeighbor(ref rootNode);
+        n3.AddNeighbor(n1);
+        n3.AddNeighbor(n2);
+        n3.AddNeighbor(rootNode);
 
 
     }

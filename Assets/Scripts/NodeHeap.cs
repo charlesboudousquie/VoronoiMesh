@@ -6,19 +6,18 @@ public class NodeHeap
 {
     int[] locationMap;
     VoronoiNode[] nodeHeap;
-    VoronoiNode nodeStart;
     int numNodes, m, f, l, r, p;
 
     public void Start() {
-        locationMap = new int[4096];
-        nodeHeap = new VoronoiNode[4096];
+        numNodes = m = f = l = r = p = 0;
     }
 
     public void InitHeap(VoronoiNode[] l) {
-        nodeStart = l[0];
-        for (int i = 0; i < 4096; i++) {
+        int n = l.Length;
+        locationMap = new int[n];
+        nodeHeap = l;
+        for (int i = 0; i < n; i++) {
             locationMap[i] = i;
-            nodeHeap[i] = l[i];
         }
     }
 
@@ -26,35 +25,63 @@ public class NodeHeap
         return numNodes == 0;
     }
 
+    void PrintHeap() {
+        string res = "full heap: ";
+        for (int i = 0; i < numNodes; i++) {
+            res = res + nodeHeap[i].Id + ": " + nodeHeap[i].Cost + ", ";
+        }
+        Debug.Log(res);
+    }
+
     public void Push(int i) {
+        string res = "";
+        for (int j = 0; j < 3; j++) {
+            res = res + nodeHeap[locationMap[i]].GetNeighbors()[j] + ", ";
+        }
+        Debug.Log(i + " pushed, with nbrs " + res);
+        nodeHeap[locationMap[i]].Open = true;
         SwapNodes(locationMap[i], numNodes);
         numNodes++;
         TrickleUp(numNodes - 1);
+        PrintHeap();
     }
 
     public void UpdateNode(int i) {
+        Debug.Log(i + " updated");
         TrickleUp(locationMap[i]);
+        PrintHeap();
     }
 
     public VoronoiNode Pop() {
+        string res = "";
+        for (int j = 0; j < 3; j++) {
+            res = res + nodeHeap[0].GetNeighbors()[j] + ", ";
+        }
+        Debug.Log(nodeHeap[0].Id + " popped, with nbrs " + res);
+        nodeHeap[0].Open = false;
+        nodeHeap[0].Closed = true;
         //could test for size 0 here, but wont for speed
         VoronoiNode top = nodeHeap[0];
         numNodes--;
         SwapNodes(0, numNodes);
         TrickleDown(0);
+        PrintHeap();
         return top;
     }
 
     public void ResetHeap() {
         numNodes = 0;
+        for (int i = 0; i < numNodes; i++) {
+            nodeHeap[i].Reset();
+        }
     }
 
     void SwapNodes(int i, int j) {
         VoronoiNode tNode = nodeHeap[i];
         nodeHeap[i] = nodeHeap[j];
         nodeHeap[j] = tNode;
-        //locationMap[nodeHeap[j].Id] = j;
-        //locationMap[nodeHeap[i].Id] = i;
+        locationMap[nodeHeap[j].Id] = j;
+        locationMap[nodeHeap[i].Id] = i;
     }
 
     void TrickleDown(int i) {
@@ -94,8 +121,21 @@ public class NodeHeap
     }
 
     bool NodeLT(VoronoiNode a, VoronoiNode b) {
-        return false;
-        //return (a.Cost < b.Cost);
+        return (a.Cost < b.Cost);
+    }
+
+    public void SetGiven(int i, int p, float g) {
+        nodeHeap[locationMap[i]].Parent = p;
+        nodeHeap[locationMap[i]].Given = g;
+        nodeHeap[locationMap[i]].Cost = nodeHeap[locationMap[i]].Given + nodeHeap[locationMap[i]].Hueristic;
+    }
+
+    public void SetHeuristic(int i, float h) {
+        nodeHeap[locationMap[i]].Hueristic = h;
+    }
+
+    public VoronoiNode GetNode(int i) {
+        return nodeHeap[locationMap[i]];
     }
 
 }
