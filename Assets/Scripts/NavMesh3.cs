@@ -38,16 +38,19 @@ public class NavMesh3 : MonoBehaviour
             for (int j = i+1; j < size; ++j)
             {
                 VoronoiNode v2 = nodes[j];
-                Vector3[] vert2 = v2.GetVertices();
                 int count = 0;
                 for(int n1 = 0; n1 < 3; ++n1)
                 {
-                    for(int n2 = n1; n2 < 3; ++n2)
+                    int ver_index1 = mesh.triangles[3 * i + n1];
+                    for (int n2 = n1; n2 < 3; ++n2)
                     {
-                        if (vert1[n1] == vert2[n2]) ++count;
+                        int ver_index2 = mesh.triangles[3 * j + n2];
+                        if (ver_index1 == ver_index2)
+                            ++count;
+
                     }
                 }
-                if(count == 2)
+                if(count >= 2)
                 {
                     v1.AddNeighbor(v2);
                     v2.AddNeighbor(v1);
