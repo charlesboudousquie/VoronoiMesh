@@ -42,17 +42,26 @@ public class NavMesh3 : MonoBehaviour
                 VoronoiNode v2 = nodes[j];
                 Vector3[] vert2 = v2.GetVertices();
                 int count = 0;
-                for(int n1 = 0; n1 < 3; ++n1)
+                List<Vector3> neighborVerts1 = new List<Vector3>();
+                List<Vector3> neighborVerts2 = new List<Vector3>();
+                for (int n1 = 0; n1 < 3; ++n1)
                 {
                     for(int n2 = 0; n2 < 3; ++n2)
                     {
-                        if (Vector3.Distance(vert1[n1], vert2[n2]) < threshold) ++count;
+                        if (Vector3.Distance(vert1[n1], vert2[n2]) < threshold)
+                        {
+                            neighborVerts1.Add(vert2[n2]);//triangle 1 neighbor verts for 2 are added
+                            neighborVerts2.Add(vert1[n1]);//triangle 2 neighbor verts for 1 are added
+                            ++count;
+                        }
                     }
                 }
                 if(count == 2)
                 {
                     v1.AddNeighbor(v2);
+                    v1.MatchingVertices.Add(v2.Id, neighborVerts1);
                     v2.AddNeighbor(v1);
+                    v2.MatchingVertices.Add(v1.Id, neighborVerts2);
                 }
             }
         }

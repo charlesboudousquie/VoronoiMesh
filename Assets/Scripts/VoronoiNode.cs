@@ -17,6 +17,7 @@ public class VoronoiNode
     public bool Open;
     public bool Closed;
     public int Parent;
+    public Dictionary<int, List<Vector3>> MatchingVertices;
     public VoronoiNode(int _id)
     {
         Id = _id;
