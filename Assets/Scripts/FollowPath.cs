@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class FollowPath : MonoBehaviour
 {
-    public Stack<Vector3> path;
+    public List<Vector3> path;
 
     Vector3 currentGoal;
 
     float epsilon = 0.001f;
+    int index = 0;
 
     void MoveTo(Vector3 goal)
     {
@@ -18,13 +19,10 @@ public class FollowPath : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        path = new Stack<Vector3>();
-        //path.Push(new Vector3(0,0,0));
-        path.Push(new Vector3(10, 0, 0));
-        //path.Push(new Vector3(0,0,0));
-        //path.Push(new Vector3(0,0,0));
-        //path.Push(new Vector3(0,0,0));
-        currentGoal = path.Pop();
+        path = new List<Vector3>();
+
+        path.Add(new Vector3(10, 0, 0));
+        currentGoal = path[index];
     }
 
     // Update is called once per frame
@@ -34,9 +32,10 @@ public class FollowPath : MonoBehaviour
 
         if (Vector3.Distance(currentGoal, gameObject.transform.position) <= epsilon)
         {
-            if (path.Count > 0)
+            if (index < path.Count - 1)
             {
-                currentGoal = path.Pop();
+                index++;
+                currentGoal = path[index];
             }
         }
     }

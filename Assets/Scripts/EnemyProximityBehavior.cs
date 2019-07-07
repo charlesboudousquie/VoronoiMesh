@@ -99,16 +99,27 @@ public class EnemyProximityBehavior : MonoBehaviour
 
         // draw debug lines
         Debug.DrawLine(ourPos, ourPos + debugDirection * 20.0f, Color.green);
-        //Handles.Label(ourPos + debugDirection * 20.0f, "Distance 20");
+        TextMesh mesh1 = gameObject.AddComponent<TextMesh>();
+        mesh1.transform.position = ourPos + debugDirection * 20.0f;
+        mesh1.text = "Distance 20";
+
+
+        
 
         Debug.DrawLine(ourPos, ourPos + debugDirection * 15.0f, Color.red);
-        //Handles.Label(ourPos + debugDirection * 15.0f, "Distance 15");
+        TextMesh mesh2 = gameObject.AddComponent<TextMesh>();
+        mesh2.transform.position = ourPos + debugDirection * 15;
+        mesh2.text = "Distance 15";
 
         Debug.DrawLine(ourPos, ourPos + debugDirection * 10.0f, Color.blue);
-        //Handles.Label(ourPos + debugDirection * 10.0f, "Distance 10");
+        TextMesh mesh3 = gameObject.AddComponent<TextMesh>();
+        mesh3.transform.position = ourPos + debugDirection * 10;
+        mesh3.text = "Distance 10";
 
         Debug.DrawLine(ourPos, ourPos + debugDirection * 5.0f, Color.white);
-        //Handles.Label(ourPos + debugDirection * 5.0f, "Distance 5");
+        TextMesh mesh4 = gameObject.AddComponent<TextMesh>();
+        mesh4.transform.position = ourPos + debugDirection * 5;
+        mesh4.text = "Distance 5";
 
         timer += Time.deltaTime;
         //int shaderID = rend.material.shader.GetInstanceID();
