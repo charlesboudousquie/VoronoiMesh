@@ -20,6 +20,8 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     float speed = 10.0f;
 
+    public float moveRandomlyRadius = 15, lookAtPlayerRadius = 10, hideFromPlayerRadius = 5;
+
     Vector3 targetPosition;
 
     void StopAndLookAtPlayer()
@@ -46,8 +48,7 @@ public class EnemyProximityBehavior : MonoBehaviour
         // set new destination
         targetPosition = this.transform.position - 10.0f * diff;
     }
-
-
+    
     Vector3 NewRandomPosition()
     {
         Vector3 newPos = gameObject.transform.position;
@@ -62,8 +63,7 @@ public class EnemyProximityBehavior : MonoBehaviour
     {
         targetPosition = NewRandomPosition();
     }
-
-
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -109,19 +109,19 @@ public class EnemyProximityBehavior : MonoBehaviour
         mesh1.transform.position = ourPos + debugDirection * 20.0f;
         mesh1.text = "Distance 20";
         
-        Debug.DrawLine(ourPos, ourPos + debugDirection * 15.0f, Color.red);
+        Debug.DrawLine(ourPos, ourPos + debugDirection * moveRandomlyRadius, Color.red);
         TextMesh mesh2 = textObjects[1].GetComponent<TextMesh>();
-        mesh2.transform.position = ourPos + debugDirection * 15;
+        mesh2.transform.position = ourPos + debugDirection * moveRandomlyRadius;
         mesh2.text = "Distance 15";
 
-        Debug.DrawLine(ourPos, ourPos + debugDirection * 10.0f, Color.blue);
+        Debug.DrawLine(ourPos, ourPos + debugDirection * lookAtPlayerRadius, Color.blue);
         TextMesh mesh3 = textObjects[2].GetComponent<TextMesh>();
-        mesh3.transform.position = ourPos + debugDirection * 10;
+        mesh3.transform.position = ourPos + debugDirection * lookAtPlayerRadius;
         mesh3.text = "Distance 10";
 
-        Debug.DrawLine(ourPos, ourPos + debugDirection * 5.0f, Color.white);
+        Debug.DrawLine(ourPos, ourPos + debugDirection * hideFromPlayerRadius, Color.white);
         TextMesh mesh4 = textObjects[3].GetComponent<TextMesh>();
-        mesh4.transform.position = ourPos + debugDirection * 5;
+        mesh4.transform.position = ourPos + debugDirection * hideFromPlayerRadius;
         mesh4.text = "Distance 5";
 
         timer += Time.deltaTime;
@@ -145,34 +145,26 @@ public class EnemyProximityBehavior : MonoBehaviour
             // if too far away dont move
             if (distance >= 20.0f)
             {
-                //Handles.Label(ourPos, "Doing Nothing");
-
                 targetPosition = this.transform.position;
             }
-            else if (distance >= 15.0f)
+            else if (distance >= moveRandomlyRadius)
             {
-                //Handles.Label(ourPos, "Moving Randomly");
-
                 if (timer > 2.0f)
                 {
                     timer = 0;
                     MoveRandomly();
                 }
             }
-            else if (distance >= 10.0f)
+            else if (distance >= lookAtPlayerRadius)
             {
-                //Handles.Label(ourPos, "Looking At Player");
                 StopAndLookAtPlayer();
             }
-            else if (distance >= 5.0f)
+            else if (distance >= hideFromPlayerRadius)
             {
-                //Handles.Label(ourPos, "Moving From Player Until Hidden");
 
             }
             else
             {
-                //Handles.Label(ourPos, "Flying away from Player");
-
                 FlyAwayFromPlayer();
             }
 
