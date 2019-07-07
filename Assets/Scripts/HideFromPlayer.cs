@@ -35,6 +35,9 @@ public class HideFromPlayer : MonoBehaviour
     {
         Vector3 playerPos = player.transform.position;
         Vector3 ourPos = this.gameObject.transform.position;
+
+
+
     }
 
     // Update is called once per frame

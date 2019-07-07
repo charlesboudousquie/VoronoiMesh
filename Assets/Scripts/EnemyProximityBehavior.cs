@@ -13,6 +13,7 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     public Rigidbody rb;
     private GameObject player;
+    private List<GameObject> textObjects;
     Renderer rend;
 
     float timer = 0.0f;
@@ -69,6 +70,12 @@ public class EnemyProximityBehavior : MonoBehaviour
         player = GameObject.Find("Player");
         targetPosition = NewRandomPosition();
         rend = this.GetComponent<Renderer>();
+        textObjects = new List<GameObject>();
+        for(int i = 0; i < 4; i++)
+        {
+            textObjects.Add(new GameObject());
+            textObjects[i].AddComponent<TextMesh>();
+        }
     }
 
     bool SeesPlayer()
@@ -95,34 +102,30 @@ public class EnemyProximityBehavior : MonoBehaviour
         Vector3 debugDirection = new Vector3(0.0f, 0.0f, 1.0f);
         Vector3 forwardVector = this.transform.forward;
         Debug.DrawLine(ourPos, ourPos + 5 * forwardVector, Color.black);
-        //Handles.Label(ourPos + 5 * forwardVector, "Forward Vector");
 
         // draw debug lines
         Debug.DrawLine(ourPos, ourPos + debugDirection * 20.0f, Color.green);
-        TextMesh mesh1 = gameObject.AddComponent<TextMesh>();
+        TextMesh mesh1 = textObjects[0].GetComponent<TextMesh>();
         mesh1.transform.position = ourPos + debugDirection * 20.0f;
         mesh1.text = "Distance 20";
-
-
         
-
         Debug.DrawLine(ourPos, ourPos + debugDirection * 15.0f, Color.red);
-        TextMesh mesh2 = gameObject.AddComponent<TextMesh>();
+        TextMesh mesh2 = textObjects[1].GetComponent<TextMesh>();
         mesh2.transform.position = ourPos + debugDirection * 15;
         mesh2.text = "Distance 15";
 
         Debug.DrawLine(ourPos, ourPos + debugDirection * 10.0f, Color.blue);
-        TextMesh mesh3 = gameObject.AddComponent<TextMesh>();
+        TextMesh mesh3 = textObjects[2].GetComponent<TextMesh>();
         mesh3.transform.position = ourPos + debugDirection * 10;
         mesh3.text = "Distance 10";
 
         Debug.DrawLine(ourPos, ourPos + debugDirection * 5.0f, Color.white);
-        TextMesh mesh4 = gameObject.AddComponent<TextMesh>();
+        TextMesh mesh4 = textObjects[3].GetComponent<TextMesh>();
         mesh4.transform.position = ourPos + debugDirection * 5;
         mesh4.text = "Distance 5";
 
         timer += Time.deltaTime;
-        //int shaderID = rend.material.shader.GetInstanceID();
+
         rend.material.shader = Shader.Find("_Color");
 
         Vector3 playerPos = player.transform.position;
