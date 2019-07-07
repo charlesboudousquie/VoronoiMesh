@@ -6,6 +6,7 @@ using UnityEngine;
 public class NavMesh3 : MonoBehaviour
 {
     public VoronoiNode[] nodes;
+    public float[] nodeVisability;
 
     void Start()
     {
@@ -67,11 +68,19 @@ public class NavMesh3 : MonoBehaviour
         }
 
         BroadcastMessage("OnMapReset");
+        Invoke("UpdateVisability", 0.25f);
     }
 
     void Update()
     {
+        
+    }
 
+    void UpdateVisability()
+    {
+
+        //last step invoke in a quarter of a second
+        Invoke("UpdateVisability", 0.25f);
     }
 
     public VoronoiNode GetNode(int _id)
