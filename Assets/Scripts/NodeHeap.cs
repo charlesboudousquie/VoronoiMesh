@@ -27,37 +27,24 @@ public class NodeHeap
 
     void PrintHeap() {
         string res = "full heap: ";
-        for (int i = 0; i < numNodes; i++) {
+        for (int i = 0; i < 3; i++) {
             res = res + nodeHeap[i].Id + ": " + nodeHeap[i].Cost + ", ";
         }
         Debug.Log(res);
     }
 
     public void Push(int i) {
-        string res = "";
-        for (int j = 0; j < 3; j++) {
-            res = res + nodeHeap[locationMap[i]].GetNeighbors()[j] + ", ";
-        }
-        Debug.Log(i + " pushed, with nbrs " + res);
         nodeHeap[locationMap[i]].Open = true;
         SwapNodes(locationMap[i], numNodes);
         numNodes++;
         TrickleUp(numNodes - 1);
-        PrintHeap();
     }
 
     public void UpdateNode(int i) {
-        Debug.Log(i + " updated");
         TrickleUp(locationMap[i]);
-        PrintHeap();
     }
 
     public VoronoiNode Pop() {
-        string res = "";
-        for (int j = 0; j < 3; j++) {
-            res = res + nodeHeap[0].GetNeighbors()[j] + ", ";
-        }
-        Debug.Log(nodeHeap[0].Id + " popped, with nbrs " + res);
         nodeHeap[0].Open = false;
         nodeHeap[0].Closed = true;
         //could test for size 0 here, but wont for speed
@@ -65,13 +52,12 @@ public class NodeHeap
         numNodes--;
         SwapNodes(0, numNodes);
         TrickleDown(0);
-        PrintHeap();
         return top;
     }
 
     public void ResetHeap() {
         numNodes = 0;
-        for (int i = 0; i < numNodes; i++) {
+        for (int i = 0; i < nodeHeap.Length; i++) {
             nodeHeap[i].Reset();
         }
     }

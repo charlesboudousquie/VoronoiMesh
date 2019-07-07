@@ -20,29 +20,15 @@ public class AStartNavMesh3 : MonoBehaviour
 
     void OnMapReset() {
         openHeap.InitHeap(navMesh.nodes);
-        string res = "";
-        for (int i = 0; i < navMesh.nodes.Length; i++) {
-            res = res + "node " + i + ": ";
-            for (int j = 0; j < 3; j++) {
-                res = res + navMesh.nodes[i].GetNeighbors()[j] + ", ";
-            }
-            res = res + "\n";
-        }
-        Debug.Log(res);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P)) {
+        if (Input.GetKey(KeyCode.P)) {
             int start = Random.Range(0, navMesh.nodes.Length);
             int end = Random.Range(0, navMesh.nodes.Length);
-            Debug.Log(start);
-            Debug.Log(end);
             moves = GetPath(navMesh.nodes[start], navMesh.nodes[end]);
-            foreach (Vector3 move in moves) {
-                Debug.Log(move);
-            }
         }
         bool first = true;
         Vector3 last = Vector3.zero;
@@ -51,7 +37,8 @@ public class AStartNavMesh3 : MonoBehaviour
                 last = move;
                 first = false;
             }
-            Debug.DrawLine(last, move, Color.black);
+            Debug.DrawLine(last, move, Color.gray, .01f, false);
+            Debug.DrawLine(last, move, Color.black, .01f);
             last = move;
         }
     }
@@ -62,19 +49,18 @@ public class AStartNavMesh3 : MonoBehaviour
         openHeap.ResetHeap();
         openHeap.Push(start.Id);
 
-        int NumLoops = 100000;
-        Debug.Log("enter pathfinding");
-        while (!openHeap.IsEmpty() && NumLoops > 0) {
-            NumLoops--;
+        int MaxNumLoops = 100000;
+        while (!openHeap.IsEmpty() && MaxNumLoops > 0) {
+            MaxNumLoops--;
             VoronoiNode least = openHeap.Pop();
 
             if (least.Id == end.Id) {
-                Debug.Log("path found");
                 while (least.Id != start.Id) {
                     path.Add(least.Position);
                     least = openHeap.GetNode(least.Parent);
                 }
                 path.Add(start.Position);
+                //funnel path!!
                 return path;
             }
 
@@ -98,10 +84,10 @@ public class AStartNavMesh3 : MonoBehaviour
             //if (request.settings.singleStep) return PathResult::PROCESSING;
         }
 
-        if (NumLoops == 0) {
-            Debug.Log("exited due to too many iterations in pathfinding loop");
+        if (MaxNumLoops == 0) {
+            Debug.Log("error: exited due to too many iterations in pathfinding loop");
         } else {
-            Debug.Log("no path found");
+            Debug.Log("error: no path found");
         }
         //handle error: no path exists
         //return PathResult::IMPOSSIBLE;

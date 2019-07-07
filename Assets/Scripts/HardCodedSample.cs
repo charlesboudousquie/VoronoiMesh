@@ -43,7 +43,7 @@ public class HardCodedSample : MonoBehaviour
         n1.Start();
         n2.Start();
         n3.Start();
-
+        /*
         rootNode.AddPoint(vertices[0]);
         rootNode.AddPoint(vertices[1]);
         rootNode.AddPoint(vertices[2]);
@@ -71,7 +71,7 @@ public class HardCodedSample : MonoBehaviour
         n3.AddNeighbor(n1);
         n3.AddNeighbor(n2);
         n3.AddNeighbor(rootNode);
-
+        */
 
     }
 

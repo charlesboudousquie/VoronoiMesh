@@ -31,20 +31,22 @@ public class NavMesh3 : MonoBehaviour
 
         //Second pass find the neighbors
         
+        float threshold = .05f;
         for(int i = 0; i < size; ++i)
         {
             VoronoiNode v1 = nodes[i];
             Vector3[] vert1 = v1.GetVertices();
             for (int j = i+1; j < size; ++j)
             {
+                if (i == j) continue;
                 VoronoiNode v2 = nodes[j];
                 Vector3[] vert2 = v2.GetVertices();
                 int count = 0;
                 for(int n1 = 0; n1 < 3; ++n1)
                 {
-                    for(int n2 = n1; n2 < 3; ++n2)
+                    for(int n2 = 0; n2 < 3; ++n2)
                     {
-                        if (vert1[n1] == vert2[n2]) ++count;
+                        if (Vector3.Distance(vert1[n1], vert2[n2]) < threshold) ++count;
                     }
                 }
                 if(count == 2)
