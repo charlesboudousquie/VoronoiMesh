@@ -13,7 +13,7 @@ public class FollowPath : MonoBehaviour
     bool navMeshInitialized = false;
 
     public float speed = 5.0f;
-    float epsilon = 0.001f;
+    float epsilon = 0.01f;
     public int index = 0;
 
     private GameObject AStarObject;
@@ -25,10 +25,21 @@ public class FollowPath : MonoBehaviour
     private float TempSpeed;
     private float waitTime;
 
+    public MeshRenderer mr, wmr;
+    public GameObject wings;
+
     void MoveTo(Vector3 goal)
     {
-        gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, goal, (speed+TempSpeed) * Time.deltaTime) + jumpDirection * Time.deltaTime;
-        jumpDirection *= jumpDegrade;
+        
+        Quaternion rot = Quaternion.LookRotation(goal - transform.position);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, rot, 100 * Time.deltaTime);
+
+        if (waitTime <= 0) {
+            gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, goal, (speed + TempSpeed) * Time.deltaTime) + jumpDirection * Time.deltaTime;
+            jumpDirection *= jumpDegrade;
+        } else {
+            waitTime -= Time.deltaTime;
+        }
     }
 
     void InitializeNavmesh()
@@ -47,6 +58,12 @@ public class FollowPath : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        wings.SetActive(false);
+        speed *= Random.Range(.9f, 1.1f);
+        transform.localScale = transform.localScale * Random.Range(.5f, 1.1f);
+        Color myRandomColor = new Color(0, Random.Range(0.3f, 1.0f), Random.Range(0.3f, 1.0f));
+        mr.material.SetColor("_EmissionColor", myRandomColor);
+        wmr.material.SetColor("_EmissionColor", myRandomColor * .8f);
         TempSpeed = 0;
         waitTime = Random.Range(0, 2);
         jumpDirection = Vector3.zero;
@@ -62,24 +79,21 @@ public class FollowPath : MonoBehaviour
         }
         else
         {
-            if (waitTime <= 0) {
-                MoveTo(currentGoal);
+            MoveTo(currentGoal);
 
-                if (Vector3.Distance(currentGoal, gameObject.transform.position) <= epsilon) {
-                    if (index > 0) {
-                        TempSpeed = 0;
-                        index--;
-                        waitTime = Random.Range(0, 5);
-                        if (waitTime < 2) {
-                            waitTime = 0;
-                        }
-                        currentGoal = path[index];
-                    } else {
-                        GenerateRandomPath();
+            if (Vector3.SqrMagnitude(currentGoal - gameObject.transform.position) <= epsilon) {
+                TempSpeed = 0;
+                wings.SetActive(false);
+                if (index > 0) {
+                    index--;
+                    waitTime = Random.Range(0, 5);
+                    if (waitTime < 2) {
+                        waitTime = 0;
                     }
+                    currentGoal = path[index];
+                } else {
+                    GenerateRandomPath();
                 }
-            } else {
-                waitTime -= Time.deltaTime; ;
             }
         }
     }
@@ -88,6 +102,8 @@ public class FollowPath : MonoBehaviour
         int rand = Random.Range(0, 5);
         VoronoiNode begin = currentNode;
         if (rand == 1) {
+            //jump
+            wings.SetActive(true);
             TempSpeed = 5;
             jumpDirection = currentNode.normal * jumpForce;
             begin = navMesh.nodes[Random.Range(0, navMesh.nodes.Length - 1)];
