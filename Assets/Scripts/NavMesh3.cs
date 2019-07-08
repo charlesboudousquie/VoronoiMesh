@@ -61,6 +61,8 @@ public class NavMesh3 : MonoBehaviour
                     }
                 }
             }
+            distanceFromPlayer = new float[size];
+            nodeVisability = new float[size];
         }
 
         BroadcastMessage("OnMapReset");
