@@ -2,6 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum DEBUG_TYPE
+{
+    NONE,
+    ALL,
+    VISABILITY_POV,
+    VISABILITY_HIDING,
+    PATH,
+    PROXIMITY
+}
 [System.Serializable]
 public class NavMesh3 : MonoBehaviour
 {
@@ -9,6 +18,7 @@ public class NavMesh3 : MonoBehaviour
     public bool ComputeNeighbors;
     public float[] nodeVisability;
     public float[] distanceFromPlayer;
+    public DEBUG_TYPE debug;
 
     void Start()
     {
@@ -94,6 +104,17 @@ public class NavMesh3 : MonoBehaviour
             {
                 nodeVisability[node.Id] = 0;
                 //move to next node
+                switch (debug)
+                {
+                    case DEBUG_TYPE.VISABILITY_HIDING:
+                        Debug.DrawLine(node.vertices[0] * .9f, node.vertices[1] * .9f, Color.red, .25f, false);
+                        Debug.DrawLine(node.vertices[2] * .9f, node.vertices[0] * .9f, Color.red, .25f, false);
+                        Debug.DrawLine(node.vertices[2] * .9f, node.vertices[1] * .9f, Color.red, .25f, false);
+                        break;
+                    default:
+                        break;
+                }
+
                 continue;
             }
             
@@ -103,10 +124,31 @@ public class NavMesh3 : MonoBehaviour
             if(Vector3.Dot(node.normal,cam_normal) < 0)
             {
                 nodeVisability[node.Id] = 1.0f;
+                switch (debug)
+                {
+                    case DEBUG_TYPE.VISABILITY_POV:
+                        Debug.DrawLine(node.vertices[0] * .9f, node.vertices[1] * .9f, Color.yellow, .25f, false);
+                        Debug.DrawLine(node.vertices[2] * .9f, node.vertices[0] * .9f, Color.yellow, .25f, false);
+                        Debug.DrawLine(node.vertices[2] * .9f, node.vertices[1] * .9f, Color.yellow, .25f, false);
+                        break;
+                    default:
+                        break;
+                }
+                
             }
             else
             {
                 nodeVisability[node.Id] = 0.0f;
+                switch (debug)
+                {
+                    case DEBUG_TYPE.VISABILITY_HIDING:
+                        Debug.DrawLine(node.vertices[0] * .9f, node.vertices[1] * .9f, Color.red, .25f, false);
+                        Debug.DrawLine(node.vertices[2] * .9f, node.vertices[0] * .9f, Color.red, .25f, false);
+                        Debug.DrawLine(node.vertices[2] * .9f, node.vertices[1] * .9f, Color.red, .25f, false);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         //last step invoke in a quarter of a second
