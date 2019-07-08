@@ -16,6 +16,7 @@ public class EnemyProximityBehavior : MonoBehaviour
     private GameObject player;
     private List<GameObject> textObjects;
     private GameObject GoalObject;
+    private GameObject playerDebugText;
     Renderer rend;
 
     NavMesh3 mesh3;
@@ -50,30 +51,8 @@ public class EnemyProximityBehavior : MonoBehaviour
     {
         TextMesh mesh = GoalObject.GetComponent<TextMesh>();
         mesh.transform.position = targetPosition;
-        string currentGoal = "Current Goal" + currentState.ToString();
+        string currentGoal = "Current Goal: " + currentState.ToString();
         mesh.text = currentGoal;
-        //switch(currentState)
-        //{
-        //    case State.RANDOM_MOVEMENT:
-        //        mesh.text = cu
-        //        break;
-
-        //    case State.LOOKING:
-
-        //        break;
-
-        //    case State.HIDING:
-
-        //        break;
-
-        //    case State.FLYING:
-
-        //        break;
-
-        //    default:
-
-        //        break;
-        //}
     }
 
     void StopAndLookAtPlayer()
@@ -144,14 +123,23 @@ public class EnemyProximityBehavior : MonoBehaviour
         ActionCoolDowntimer = new Timer();
         mesh3 = gameObject.GetComponent<AStartNavMesh3>().navMesh;
         player = GameObject.Find("Player");
+
         GoalObject = new GameObject();
+        GoalObject.AddComponent<TextMesh>();
+        GoalObject.name = "Goal";
+
+        playerDebugText = new GameObject();
+        playerDebugText.AddComponent<TextMesh>();
+
         targetPosition = NewRandomPosition();
         rend = this.GetComponent<Renderer>();
+
         textObjects = new List<GameObject>();
         for (int i = 0; i < 4; i++)
         {
             textObjects.Add(new GameObject());
             textObjects[i].AddComponent<TextMesh>();
+            textObjects[i].name = "Debug Radius Line";
         }
     }
 
@@ -297,5 +285,8 @@ public class EnemyProximityBehavior : MonoBehaviour
             Debug.DrawLine(ourPos, playerPos, Color.blue);
             rend.material.SetColor("_Color", Color.blue);
         }
+        TextMesh playerTextDistance = playerDebugText.GetComponent<TextMesh>();
+        playerTextDistance.text = "Distance to Player: " + Vector3.Distance(playerPos, ourPos).ToString();
+        playerTextDistance.transform.position = (playerPos + ourPos) / 2.0f;
     }
 }
