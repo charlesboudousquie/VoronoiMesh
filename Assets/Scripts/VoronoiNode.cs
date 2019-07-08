@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class VoronoiNode
 {
-
-    private int[] neighbors;
-    private Vector3[] vertices;
-    private Vector3 normal;
-    public Vector3 Position { get; set; }
-    int numVerts, numNeighbors;
-    public int Id { get; }
+    
+    public int[] neighbors;
+    public Vector3[] vertices;
+    public Vector3 normal;
+    public Vector3 Position;
+    public int numVerts, numNeighbors;
+    public int Id;
     public float Cost;
     public float Hueristic;//recommend Euclidean distance
     public float Given;
@@ -30,6 +31,19 @@ public class VoronoiNode
     // Start is called before the first frame update
     public void Start()
     {
+
+    }
+
+    public List<Vector3> GetBorderPoints(VoronoiNode n) {
+        List<Vector3> bns = new List<Vector3>();
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (Vector3.Distance(vertices[i], n.vertices[j]) < .01f) {
+                    bns.Add(vertices[i]);
+                }
+            }
+        }
+        return bns;
     }
 
     public void Reset()
@@ -57,7 +71,7 @@ public class VoronoiNode
     }
 
     public void SetNormal(Vector3 n) {
-        normal = n;
+        normal = n.normalized;
     }
 
 
