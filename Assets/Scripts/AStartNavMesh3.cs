@@ -8,21 +8,30 @@ public class AStartNavMesh3 : MonoBehaviour
     public NavMesh3 navMesh;
     List<Vector3> moves;
     List<Vector3> smoothMoves, roughMoves;
+    public bool readyToPathfind = false;
 
     // Start is called before the first frame update
     void Start()
     {
+        navMesh = GetComponent<NavMesh3>();
         moves = new List<Vector3>();
         smoothMoves = new List<Vector3>();
         roughMoves = new List<Vector3>();
-        openHeap = new NodeHeap();
+        if (openHeap == null) {
+            openHeap = new NodeHeap();
+        }
         if (navMesh != null && navMesh.nodes != null) {
             openHeap.InitHeap(navMesh.nodes);
+            readyToPathfind = true;
         }
     }
 
     void OnMapReset() {
+        if (openHeap == null) {
+            openHeap = new NodeHeap();
+        }
         openHeap.InitHeap(navMesh.nodes);
+        readyToPathfind = true;
         Debug.Log("mesh loaded, numNodes = " + navMesh.nodes.Length);
         /*
         string res = "";
@@ -76,7 +85,7 @@ public class AStartNavMesh3 : MonoBehaviour
 
     public List<Vector3> GetPath(VoronoiNode start, VoronoiNode end) {
         List<Vector3> path = new List<Vector3>();
-        
+
         openHeap.ResetHeap();
         openHeap.Push(start.Id);
 

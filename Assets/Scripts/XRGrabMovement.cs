@@ -29,7 +29,7 @@ public class XRGrabMovement : MonoBehaviour
             if (isRightDown() && isLeftDown()) {
                 Vector3 currPosition = (rController.position + lController.position) / 2;
                 if (lGripped && rGripped) {
-                    transform.Translate(currPosition - LastPos);
+                    transform.Translate(-(currPosition - LastPos));
                 } else {
                     lGripped = true;
                     rGripped = true;
@@ -38,7 +38,7 @@ public class XRGrabMovement : MonoBehaviour
             } else if (isRightDown()) {
                 Vector3 currPosition = rController.position;
                 if (rGripped) {
-                    transform.Translate(currPosition - LastPos);
+                    transform.Translate(-(currPosition - LastPos));
                 } else {
                     rGripped = true;
                 }
@@ -47,7 +47,7 @@ public class XRGrabMovement : MonoBehaviour
             } else if (isLeftDown()) {
                 Vector3 currPosition = lController.position;
                 if (lGripped) {
-                    transform.Translate(currPosition - LastPos);
+                    transform.Translate(-(currPosition - LastPos));
                 } else {
                     lGripped = true;
                 }
