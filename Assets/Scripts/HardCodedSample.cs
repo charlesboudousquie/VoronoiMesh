@@ -38,40 +38,7 @@ public class HardCodedSample : MonoBehaviour
         VoronoiNode n1 = new VoronoiNode(1);
         VoronoiNode n2 = new VoronoiNode(2);
         VoronoiNode n3 = new VoronoiNode(3);
-
-        rootNode.Start();
-        n1.Start();
-        n2.Start();
-        n3.Start();
-        /*
-        rootNode.AddPoint(vertices[0]);
-        rootNode.AddPoint(vertices[1]);
-        rootNode.AddPoint(vertices[2]);
-        rootNode.AddNeighbor(n1);
-        rootNode.AddNeighbor(n2);
-        rootNode.AddNeighbor(n3);
-
-        n1.AddPoint(vertices[1]);
-        n1.AddPoint(vertices[0]);
-        n1.AddPoint(vertices[3]);
-        n1.AddNeighbor(rootNode);
-        n1.AddNeighbor(n2);
-        n1.AddNeighbor(n3);
-
-        n2.AddPoint(vertices[0]);
-        n2.AddPoint(vertices[2]);
-        n2.AddPoint(vertices[3]);
-        n2.AddNeighbor(n1);
-        n2.AddNeighbor(rootNode);
-        n2.AddNeighbor(n3);
-
-        n3.AddPoint(vertices[2]);
-        n3.AddPoint(vertices[1]);
-        n3.AddPoint(vertices[3]);
-        n3.AddNeighbor(n1);
-        n3.AddNeighbor(n2);
-        n3.AddNeighbor(rootNode);
-        */
+        
 
     }
 

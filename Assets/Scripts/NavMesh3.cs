@@ -7,6 +7,8 @@ public class NavMesh3 : MonoBehaviour
 {
     public VoronoiNode[] nodes;
     public bool ComputeNeighbors;
+    public float[] nodeVisability;
+    public float[] distanceFromPlayer;
 
     void Start()
     {
@@ -62,11 +64,51 @@ public class NavMesh3 : MonoBehaviour
         }
 
         BroadcastMessage("OnMapReset");
+        Invoke("UpdateVisability", 0.25f);
     }
 
     void Update()
     {
+        
+    }
 
+    void UpdateVisability()
+    {
+        Camera cam = Camera.main;
+        Vector3 cam_normal = cam.transform.forward.normalized;
+        Vector3 cam_pos = cam.transform.position;
+        float degrees_fov = cam.fieldOfView;
+        foreach(VoronoiNode node in nodes)
+        {
+            float dis_sq = Vector3.SqrMagnitude(cam_pos-node.Position);
+            distanceFromPlayer[node.Id] = dis_sq;
+
+            Vector3 line_to_node = cam_pos - node.Position;
+            line_to_node = line_to_node.normalized;
+            //cam normal and line between cam and node
+            //dot product  > 0  within the field of view potentially
+            //else not in the field of view 
+            if (Vector3.Dot(cam_normal,line_to_node) < 0)
+            {
+                nodeVisability[node.Id] = 0;
+                //move to next node
+                continue;
+            }
+            
+            //line between cam and node
+            //dot product < 0  visable
+            //else not visable
+            if(Vector3.Dot(node.normal,cam_normal) < 0)
+            {
+                nodeVisability[node.Id] = 1.0f;
+            }
+            else
+            {
+                nodeVisability[node.Id] = 0.0f;
+            }
+        }
+        //last step invoke in a quarter of a second
+        Invoke("UpdateVisability", 0.25f);
     }
 
     public VoronoiNode GetNode(int _id)

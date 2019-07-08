@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class VoronoiNode
 {
-
+    
     public int[] neighbors;
     public Vector3[] vertices;
     public Vector3 normal;
@@ -18,7 +18,6 @@ public class VoronoiNode
     public bool Open;
     public bool Closed;
     public int Parent;
-    //public Dictionary<int, List<Vector3>> MatchingVertices;
     public VoronoiNode(int _id)
     {
         Id = _id;
@@ -28,7 +27,6 @@ public class VoronoiNode
         vertices = new Vector3[3];
         numVerts = 0;
         numNeighbors = 0;
-        //MatchingVertices = new Dictionary<int, List<Vector3>>();
     }
     // Start is called before the first frame update
     public void Start()
@@ -73,7 +71,7 @@ public class VoronoiNode
     }
 
     public void SetNormal(Vector3 n) {
-        normal = n;
+        normal = n.normalized;
     }
 
 
