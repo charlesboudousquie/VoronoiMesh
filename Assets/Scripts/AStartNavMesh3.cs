@@ -223,14 +223,11 @@ public class AStartNavMesh3 : MonoBehaviour
     }
 
 
-    public VoronoiNode GetFurthestNode(Vector3 position) {
-        VoronoiNode FurthestNode = openHeap.GetNode(0);
+    public VoronoiNode GetFurthestNode(Vector3 position, float distToFlee) {
+        VoronoiNode FurthestNode = openHeap.GetNode(Random.Range(0,navMesh.nodes.Length-1));
 
         openHeap.ResetHeap();
         openHeap.Push(0);
-
-        int numCloser = 0;
-        float furthestDist = 10000;
 
         int MaxNumLoops = 100000;
         while (!openHeap.IsEmpty() && MaxNumLoops > 0) {
@@ -238,15 +235,8 @@ public class AStartNavMesh3 : MonoBehaviour
             VoronoiNode least = openHeap.Pop();
             float distToPos = Vector3.SqrMagnitude(least.Position - position);
 
-            if (distToPos > furthestDist) {
-                FurthestNode = least;
-                furthestDist = distToPos;
-                numCloser = 0;
-            } else {
-                numCloser++;
-                if (numCloser > 10) {
-                    return FurthestNode;
-                }
+            if (distToPos > distToFlee) {
+                return FurthestNode;
             }
 
             //if (request.settings.debugColoring) terrain->set_color(ly, lx, Colors::Blue);

@@ -62,6 +62,11 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     private bool WorkingOnPath;
 
+    private float tempSpeed;
+    private Vector3 jumpDirection;
+
+    public float jumpDecay;
+
     // depending on the state the goal will be displayed
     // showing what the current objective of the AI is
     void DisplayGoal()
@@ -85,11 +90,11 @@ public class EnemyProximityBehavior : MonoBehaviour
     {
 
         wings.SetActive(true);
-
+        jumpDirection = lastPosition.normal * speed;
         // get player position
         Vector3 playerPos = player.transform.position;
 
-        lastPosition = AStarNavMesh.GetFurthestNode(playerPos);
+        lastPosition = AStarNavMesh.GetFurthestNode(playerPos, 20);
 
         /*
         Vector3 vecToPlayer = playerPos - this.transform.position;
@@ -344,11 +349,12 @@ public class EnemyProximityBehavior : MonoBehaviour
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, rot, 100 * Time.deltaTime);
             }
             
-            this.transform.position = Vector3.MoveTowards(this.transform.position, currentPath[pathListIndex], speed * Time.deltaTime);
-
+            this.transform.position = Vector3.MoveTowards(this.transform.position, currentPath[pathListIndex], speed * Time.deltaTime) + jumpDirection * Time.deltaTime;
+            jumpDirection *= jumpDecay;
             if (Vector3.Distance(this.transform.position, currentPath[pathListIndex]) <= epsilon)
             {
                 wings.SetActive(false);
+                tempSpeed = 0;
                 // update current position node
                 
 
