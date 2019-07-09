@@ -43,8 +43,10 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     public float speed = 2.0f;
 
-    //public float minFleeDist = 5.0f;
-    //public float maxFleeDist = 20.0f;
+    public float minFleeDist = 1.0f;
+    public float maxFleeDist = 4.0f;
+
+    private VoronoiNode lastPosition;
 
     public float maxDistance = 4, moveRandomlyRadius = 3, lookAtPlayerRadius = 2, hideFromPlayerRadius = 1;
 
@@ -73,39 +75,39 @@ public class EnemyProximityBehavior : MonoBehaviour
         this.transform.LookAt(playerPos);
     }
 
-    //void FlyAwayFromPlayer()
-    //{
-    //    // get player position
-    //    Vector3 playerPos = player.transform.position;
+    void FlyAwayFromPlayer()
+    {
+        // get player position
+        Vector3 playerPos = player.transform.position;
 
-    //    Vector3 vecToPlayer = playerPos - this.transform.position;
-    //    vecToPlayer.Normalize();
+        Vector3 vecToPlayer = playerPos - this.transform.position;
+        vecToPlayer.Normalize();
 
-    //    // set new destination
-    //    // new destination is a node that is in the opposite direction of the player
+        // set new destination
+        // new destination is a node that is in the opposite direction of the player
 
-    //    // first find random points
-    //    VoronoiNode[] nodes = mesh3.nodes;
-    //    for (int i = 0; i < nodes.Length; i++)
-    //    {
-    //        float distance = Vector3.Distance(nodes[i].Position, playerPos);
-    //        if (distance >= minFleeDist && distance <= maxFleeDist)
-    //        {
-    //            // dot the diff vector with the vector between the node and the enemy
-    //            Vector3 vecToNode = nodes[i].Position - this.transform.position;
-    //            vecToNode.Normalize();
+        // first find random points
+        VoronoiNode[] nodes = mesh3.nodes;
+        for (int i = 0; i < nodes.Length; i++)
+        {
+            float distance = Vector3.Distance(nodes[i].Position, playerPos);
+            if (distance >= minFleeDist && distance <= maxFleeDist)
+            {
+                // dot the diff vector with the vector between the node and the enemy
+                Vector3 vecToNode = nodes[i].Position - this.transform.position;
+                vecToNode.Normalize();
 
-    //            // if node is in opposite direction of player
-    //            // then it is acceptable
-    //            float dotProduct = Vector3.Dot(vecToPlayer, vecToNode);
-    //            if (dotProduct < 0)
-    //            {
-    //                targetPosition = nodes[i].Position;
-    //                return;
-    //            }
-    //        }
-    //    }
-    //}
+                // if node is in opposite direction of player
+                // then it is acceptable
+                float dotProduct = Vector3.Dot(vecToPlayer, vecToNode);
+                if (dotProduct < 0)
+                {
+                    targetNode = nodes[i];
+                    return;
+                }
+            }
+        }
+    }
 
     //VoronoiNode NewRandomPosition()
     //{
@@ -116,7 +118,6 @@ public class EnemyProximityBehavior : MonoBehaviour
     //        return mesh3.nodes[randomIndex];
     //    }
     //    return null;
-
     //    //Vector3 newPos = gameObject.transform.position;
     //    //newPos.x += Random.Range(-10, 10);
     //    //newPos.z += Random.Range(-10, 10);
@@ -209,15 +210,10 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     void ChangeState()
     {
-        State previousState = currentState;
-
         // find new state
         float distance = playerDistanceVar;
-        //Vector3.Distance(player.transform.position, this.transform.position);
-        //if (distance > maxDistance)
-        //{
-        //    currentState = State.NONE;
-        //}
+        //float distance = Vector3.Distance(player.transform.position, this.transform.position);
+        
         if (distance > moveRandomlyRadius)
         {
             currentState = State.RANDOM_MOVEMENT;
@@ -226,14 +222,14 @@ public class EnemyProximityBehavior : MonoBehaviour
         //{
         //    currentState = State.LOOKING;
         //}
-        else /*if (distance > hideFromPlayerRadius)*/
+        else if (distance > hideFromPlayerRadius)
         {
             currentState = State.HIDING;
         }
-        //else
-        //{
-        //    currentState = State.FLYING;
-        //}
+        else
+        {
+            currentState = State.FLYING;
+        }
     }
     void DoStateAction()
     {
@@ -251,7 +247,8 @@ public class EnemyProximityBehavior : MonoBehaviour
                 SetNewPath();
                 break;
             case State.FLYING:
-                //FlyAwayFromPlayer();
+                FlyAwayFromPlayer();
+                SetNewPath();
                 break;
             default:
                 break;
@@ -260,16 +257,18 @@ public class EnemyProximityBehavior : MonoBehaviour
     void SetNewPath()
     {
         // find out what node we are closest to
-        VoronoiNode begin = mesh3.GetNode(mesh3.nodes[mesh3.nodes.Length - 1].Position);
+        
+        VoronoiNode begin = mesh3.GetNode(currentPath[0]);
 
         if (currentState == State.HIDING)
         {
-            currentPath = AStarNavMesh.GetPathToSafeSpot(begin, 0.1f);
+            currentPath = AStarNavMesh.GetPathToSafeSpot(lastPosition, 0.1f, out lastPosition);
         }
         else
         {
             VoronoiNode end = mesh3.GetNode(targetNode.Position);
-            currentPath = AStarNavMesh.GetPath(begin, end);
+            currentPath = AStarNavMesh.GetPath(lastPosition, end);
+            lastPosition = end;
         }
 
         if (currentPath.Count == 0)
@@ -286,14 +285,15 @@ public class EnemyProximityBehavior : MonoBehaviour
     void Update()
     {
         if (scriptEnabled == false) { return; }
-
         if (initialized == false) { InitializePath(); return; }
-
         if (debugDrawingOn == true)
         {
             DisplayGoal();
             DebugDrawing();
         }
+
+        // UNCOMMENT THIS WHEN DONE
+        //playerDistanceVar = Vector3.Distance(this.transform.position, player.transform.position);
 
         //distance 4: move randomly
         //{ distance 3: stop and look at player }
