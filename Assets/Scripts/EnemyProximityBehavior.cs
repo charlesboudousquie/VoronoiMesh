@@ -40,12 +40,12 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     State currentState = State.NONE;
 
-    public float speed = 10.0f;
+    public float speed = 2.0f;
 
     public float minFleeDist = 5.0f;
     public float maxFleeDist = 20.0f;
 
-    public float maxDistance = 40, moveRandomlyRadius = 30, lookAtPlayerRadius = 20, hideFromPlayerRadius = 10;
+    public float maxDistance = 4, moveRandomlyRadius = 3, lookAtPlayerRadius = 2, hideFromPlayerRadius = 1;
 
     TextMesh goalTextMesh;
 
@@ -132,7 +132,7 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     void MoveRandomly()
     {
-        targetNode = mesh3.nodes[ RandomIndex()];
+        targetNode = mesh3.nodes[RandomIndex()];
     }
 
     VoronoiNode GetClosestNode(Vector3 position)
@@ -153,7 +153,7 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     void InitializePath()
     {
-        if(AStarNavMesh.readyToPathfind == true)
+        if (AStarNavMesh.readyToPathfind == true)
         {
             this.transform.position = mesh3.nodes[RandomIndex()].Position;
             targetNode = mesh3.nodes[RandomIndex()];
@@ -266,11 +266,11 @@ public class EnemyProximityBehavior : MonoBehaviour
     }
     void SetNewPath()
     {
-        
-        // find out what node we are closest to
-        VoronoiNode begin = mesh3.GetNode( mesh3.nodes[mesh3.nodes.Length - 1].Position);
 
-        if(currentState == State.HIDING)
+        // find out what node we are closest to
+        VoronoiNode begin = mesh3.GetNode(mesh3.nodes[mesh3.nodes.Length - 1].Position);
+
+        if (currentState == State.HIDING)
         {
             currentPath = AStarNavMesh.GetPathToSafeSpot(begin, 0.9f);
         }
@@ -287,9 +287,9 @@ public class EnemyProximityBehavior : MonoBehaviour
     {
         if (scriptEnabled == false) { return; }
 
-        if(initialized == false) { InitializePath(); return; }
+        if (initialized == false) { InitializePath(); return; }
 
-        if(debugDrawingOn == true)
+        if (debugDrawingOn == true)
         {
             DisplayGoal();
             DebugDrawing();
@@ -307,7 +307,10 @@ public class EnemyProximityBehavior : MonoBehaviour
         }
 
         // traverse between our current node and target node
-        this.transform.position = Vector3.MoveTowards(this.transform.position, currentPath[pathListIndex], speed * Time.deltaTime);
+        if (currentState != State.NONE)
+        {
+            this.transform.position = Vector3.MoveTowards(this.transform.position, currentPath[pathListIndex], speed * Time.deltaTime);
+        }
 
         if (Vector3.Distance(this.transform.position, currentPath[pathListIndex]) <= epsilon)
         {
