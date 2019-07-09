@@ -83,9 +83,9 @@ public class AStartNavMesh3 : MonoBehaviour
         }
     }
 
-    public List<Vector3> GetPathToSafeSpot(VoronoiNode start, float SafetyThreshold) {
+    public List<Vector3> GetPathToSafeSpot(VoronoiNode start, float SafetyThreshold, out VoronoiNode safeSpot) {
         List<Vector3> path = new List<Vector3>();
-
+        safeSpot = start;
         if (navMesh.nodeVisability[start.Id] < SafetyThreshold) return path;
         openHeap.ResetHeap();
         openHeap.Push(start.Id);
@@ -96,6 +96,7 @@ public class AStartNavMesh3 : MonoBehaviour
             VoronoiNode least = openHeap.Pop();
 
             if (navMesh.nodeVisability[least.Id] < SafetyThreshold) {
+                safeSpot = least;
                 int numStops = 1;
                 List<VoronoiNode> nodeList = new List<VoronoiNode>();
                 while (least.Id != start.Id) {
