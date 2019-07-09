@@ -60,8 +60,6 @@ public class EnemyProximityBehavior : MonoBehaviour
     public GameObject wings;
     public MeshRenderer bmr, wmr;
 
-    private bool WorkingOnPath;
-
     private float tempSpeed;
     private Vector3 jumpDirection;
 
@@ -239,30 +237,48 @@ public class EnemyProximityBehavior : MonoBehaviour
     void ChangeState()
     {
         // find new state
-        //float distance = playerDistanceVar;
-        //float distance = Vector3.Distance(player.transform.position, this.transform.position);
-        Color myRandomColor = Color.white;
-        float lowColor = Random.Range(0.0f, 0.3f);
-        float highColor = Random.Range(0.5f, 1.0f);
+        playerDistanceVar = Vector3.Distance(this.transform.position, player.transform.position);
+        State priorState = currentState;
         if (playerDistanceVar > moveRandomlyRadius)
         {
-            myRandomColor = new Color(lowColor, highColor, lowColor);
             currentState = State.RANDOM_MOVEMENT;
         }
         else if (playerDistanceVar > lookAtPlayerRadius) 
         {
-            myRandomColor = new Color(lowColor, lowColor, highColor);
             currentState = State.LOOKING;
         }
         else if (playerDistanceVar > hideFromPlayerRadius) 
         {
-            myRandomColor = new Color(highColor, highColor, lowColor);
             currentState = State.HIDING;
         }
         else 
         {
-            myRandomColor = new Color(highColor, lowColor, lowColor);
             currentState = State.FLYING;
+        }
+        if (currentState != priorState) {
+            ChangeMyColor();
+        }
+    }
+
+    void ChangeMyColor() {
+        Color myRandomColor = Color.white;
+        float lowColor = Random.Range(0.0f, 0.3f);
+        float highColor = Random.Range(0.5f, 1.0f);
+        switch (currentState) {
+            case (State.RANDOM_MOVEMENT):
+                myRandomColor = new Color(lowColor, highColor, lowColor);
+                break;
+            case (State.LOOKING):
+                myRandomColor = new Color(lowColor, lowColor, highColor);
+                break;
+            case (State.HIDING):
+                myRandomColor = new Color(highColor, highColor, lowColor);
+                break;
+            case (State.FLYING):
+                myRandomColor = new Color(highColor, lowColor, lowColor);
+                break;
+            default:
+                break;
         }
         bmr.material.SetColor("_EmissionColor", myRandomColor);
         wmr.material.SetColor("_EmissionColor", myRandomColor * .8f);
@@ -309,7 +325,6 @@ public class EnemyProximityBehavior : MonoBehaviour
         }
         else
         {
-            WorkingOnPath = true;
             pathListIndex = currentPath.Count - 1;
         }
     }
@@ -317,15 +332,14 @@ public class EnemyProximityBehavior : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (scriptEnabled == false) { return; }
+        //if (scriptEnabled == false) { return; }
         if (initialized == false) { InitializePath(); return; }
-        playerDistanceVar = Vector3.Distance(this.transform.position, player.transform.position);
 
-        if (debugDrawingOn == true)
+        /*if (debugDrawingOn == true)
         {
             DisplayGoal();
             DebugDrawing();
-        }
+        }*/
 
         // UNCOMMENT THIS WHEN DONE
 
@@ -338,9 +352,9 @@ public class EnemyProximityBehavior : MonoBehaviour
             ChangeState();
             DoStateAction();
         }
-
+        else
         // traverse between our current node and target node
-        if (currentState != State.NONE && currentState != State.LOOKING)
+        //if (currentState != State.NONE && currentState != State.LOOKING)
         {
             
             Vector3 movementDirection = currentPath[pathListIndex] - transform.position;
@@ -348,20 +362,22 @@ public class EnemyProximityBehavior : MonoBehaviour
                 Quaternion rot = Quaternion.LookRotation(movementDirection);
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, rot, 100 * Time.deltaTime);
             }
-            
-            this.transform.position = Vector3.MoveTowards(this.transform.position, currentPath[pathListIndex], speed * Time.deltaTime) + jumpDirection * Time.deltaTime;
-            jumpDirection *= jumpDecay;
-            if (Vector3.Distance(this.transform.position, currentPath[pathListIndex]) <= epsilon)
+
+            if (wings.activeInHierarchy) {
+                this.transform.position = Vector3.MoveTowards(this.transform.position, currentPath[pathListIndex], speed * Time.deltaTime) + jumpDirection * Time.deltaTime;
+                jumpDirection *= jumpDecay;
+            } else {
+                this.transform.position = Vector3.MoveTowards(this.transform.position, currentPath[pathListIndex], speed * Time.deltaTime);
+            }
+
+            if (Vector3.SqrMagnitude(this.transform.position - currentPath[pathListIndex]) <= epsilon)
             {
                 wings.SetActive(false);
-                tempSpeed = 0;
                 // update current position node
                 
-
                 pathListIndex--;
                 if (pathListIndex == -1)
-                    {
-                    WorkingOnPath = false;
+                {
                     currentState = State.NONE;
                 }
                 else
