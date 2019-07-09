@@ -23,6 +23,8 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     public GameObject enemyBody;
 
+    public float playerDistanceVar;
+
     private bool initialized = false;
 
     public bool debugDrawingOn = true;
@@ -69,11 +71,6 @@ public class EnemyProximityBehavior : MonoBehaviour
 
         // make our object look at player
         this.transform.LookAt(playerPos);
-
-        ChangeState();
-        // stop our object
-        //targetPosition = this.transform.position;
-        //rb.velocity = new Vector3(0, 0, 0);
     }
 
     //void FlyAwayFromPlayer()
@@ -171,7 +168,7 @@ public class EnemyProximityBehavior : MonoBehaviour
         GoalObject = new GameObject();
         goalTextMesh = GoalObject.AddComponent<TextMesh>();
         GoalObject.name = "Goal";
-        
+
         playerDebugText = new GameObject();
         playerDebugText.AddComponent<TextMesh>();
         textObjects = new List<GameObject>();
@@ -215,52 +212,46 @@ public class EnemyProximityBehavior : MonoBehaviour
         State previousState = currentState;
 
         // find new state
-        float distance = Vector3.Distance(player.transform.position, this.transform.position);
-        if (distance > maxDistance)
-        {
-            currentState = State.NONE;
-        }
-        else if (distance > moveRandomlyRadius)
+        float distance = playerDistanceVar;
+        //Vector3.Distance(player.transform.position, this.transform.position);
+        //if (distance > maxDistance)
+        //{
+        //    currentState = State.NONE;
+        //}
+        if (distance > moveRandomlyRadius)
         {
             currentState = State.RANDOM_MOVEMENT;
         }
-        else if (distance > lookAtPlayerRadius)
-        {
-            currentState = State.LOOKING;
-        }
-        else if (distance > hideFromPlayerRadius)
+        //else if (distance > lookAtPlayerRadius)
+        //{
+        //    currentState = State.LOOKING;
+        //}
+        else /*if (distance > hideFromPlayerRadius)*/
         {
             currentState = State.HIDING;
         }
-        else
-        {
-            currentState = State.FLYING;
-        }
+        //else
+        //{
+        //    currentState = State.FLYING;
+        //}
     }
     void DoStateAction()
     {
         switch (currentState)
         {
             case State.RANDOM_MOVEMENT:
-                //if (ActionCoolDowntimer.LimitReached())
-                //{
                 MoveRandomly();
-                //ActionCoolDowntimer.Reset();
-                //}
+                SetNewPath();
                 break;
             case State.LOOKING:
-                StopAndLookAtPlayer();
+                //StopAndLookAtPlayer();
                 break;
             case State.HIDING:
                 // hide from player
-                //ActionCoolDowntimer.Reset();
+                SetNewPath();
                 break;
             case State.FLYING:
-                //if (ActionCoolDowntimer.LimitReached())
-                //{
                 //FlyAwayFromPlayer();
-                //ActionCoolDowntimer.Reset();
-                //}
                 break;
             default:
                 break;
@@ -279,6 +270,14 @@ public class EnemyProximityBehavior : MonoBehaviour
         {
             VoronoiNode end = mesh3.GetNode(targetNode.Position);
             currentPath = AStarNavMesh.GetPath(begin, end);
+        }
+
+        if (currentPath.Count == 0)
+        {
+            currentState = State.NONE;
+        }
+        else
+        {
             pathListIndex = currentPath.Count - 1;
         }
     }
@@ -300,26 +299,25 @@ public class EnemyProximityBehavior : MonoBehaviour
         //{ distance 3: stop and look at player }
         //distance 2: move away from player until obscured
         //{ distance 1: fly away from player }
-        if (currentState == State.NONE)
+        if (currentState == State.NONE || currentState == State.LOOKING)
         {
             ChangeState();
             DoStateAction();
-            SetNewPath();
         }
 
         // traverse between our current node and target node
         if (currentState != State.NONE && currentState != State.LOOKING)
         {
             this.transform.position = Vector3.MoveTowards(this.transform.position, currentPath[pathListIndex], speed * Time.deltaTime);
-        }
 
-        if (Vector3.Distance(this.transform.position, currentPath[pathListIndex]) <= epsilon)
-        {
-            // update current position node
-            pathListIndex--;
-            if (pathListIndex == -1)
+            if (Vector3.Distance(this.transform.position, currentPath[pathListIndex]) <= epsilon)
             {
-                currentState = State.NONE;
+                // update current position node
+                pathListIndex--;
+                if (pathListIndex == -1)
+                {
+                    currentState = State.NONE;
+                }
             }
         }
     }
@@ -361,7 +359,7 @@ public class EnemyProximityBehavior : MonoBehaviour
         TextMesh playerTextDistance = playerDebugText.GetComponent<TextMesh>();
         playerTextDistance.text = "Distance to Player: " + Vector3.Distance(playerPos, ourPos).ToString();
         playerTextDistance.color = Color.red;
-        playerTextDistance.fontSize = 15;
+        playerTextDistance.fontSize = 8;
         playerTextDistance.transform.position = (playerPos + ourPos) / 2.0f;
     }
 }
