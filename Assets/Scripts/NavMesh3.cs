@@ -131,11 +131,12 @@ public class NavMesh3 : MonoBehaviour
 
                 continue;
             }
-            
+
             //line between cam and node
             //dot product < 0  visable
             //else not visable
-            if(Vector3.Dot(node.normal,line_to_node) > 0)
+            float n = Vector3.Dot(node.normal, line_to_node);
+            if ( n > 0)
             {
                 nodeVisability[node.Id] = 1.0f;
                 switch (debug)
@@ -150,7 +151,8 @@ public class NavMesh3 : MonoBehaviour
             }
             else
             {
-                nodeVisability[node.Id] = 0.0f;
+                nodeVisability[node.Id] = .5f+n;
+                if (nodeVisability[node.Id] < 0) nodeVisability[node.Id] = 0;
                 switch (debug)
                 {
                     case DEBUG_TYPE.VISABILITY_POV:
