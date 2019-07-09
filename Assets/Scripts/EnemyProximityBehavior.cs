@@ -154,7 +154,8 @@ public class EnemyProximityBehavior : MonoBehaviour
     {
         if (AStarNavMesh.readyToPathfind == true)
         {
-            this.transform.position = mesh3.nodes[RandomIndex()].Position;
+            lastPosition = mesh3.nodes[RandomIndex()];
+            this.transform.position = lastPosition.Position;
             targetNode = mesh3.nodes[RandomIndex()];
             SetNewPath();
             initialized = true;
@@ -258,7 +259,7 @@ public class EnemyProximityBehavior : MonoBehaviour
     {
         // find out what node we are closest to
         
-        VoronoiNode begin = mesh3.GetNode(currentPath[0]);
+        //VoronoiNode begin = mesh3.GetNode(currentPath[0]);
 
         if (currentState == State.HIDING)
         {
