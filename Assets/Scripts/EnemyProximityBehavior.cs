@@ -12,7 +12,7 @@ public class EnemyProximityBehavior : MonoBehaviour
     //distance 2: move away from player until obscured
     //{ distance 1: fly away from player }
 
-    public Rigidbody rb;
+    //public Rigidbody rb;
     private GameObject player;
     private List<GameObject> textObjects;
     private GameObject GoalObject;
@@ -148,8 +148,8 @@ public class EnemyProximityBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        AStarNavMesh = gameObject.GetComponent<AStartNavMesh3>();
-        mesh3 = gameObject.GetComponent<AStartNavMesh3>().navMesh;
+        //AStarNavMesh = gameObject.GetComponent<AStartNavMesh3>();
+        //mesh3 = gameObject.GetComponent<AStartNavMesh3>().navMesh;
         this.transform.position = mesh3.nodes[RandomIndex()].Position;
         targetNode = mesh3.nodes[RandomIndex()];
         SetNewPath();
@@ -257,9 +257,17 @@ public class EnemyProximityBehavior : MonoBehaviour
     void SetNewPath()
     {
         // find out what node we are closest to
-        VoronoiNode start = GetClosestNode(this.transform.position);
-        VoronoiNode end = GetClosestNode(targetNode.Position);
-        currentPath = AStarNavMesh.GetPath(start, end);
+        VoronoiNode begin = mesh3.GetNode( mesh3.nodes[mesh3.nodes.Length - 1].Position);
+
+        if(currentState == State.HIDING)
+        {
+            currentPath = AStarNavMesh.GetPathToSafeSpot(begin, 0.5f);
+        }
+        else
+        {
+            VoronoiNode end = mesh3.GetNode(targetNode.Position);
+            currentPath = AStarNavMesh.GetPath(begin, end);
+        }
     }
 
     // Update is called once per frame
