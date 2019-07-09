@@ -17,7 +17,6 @@ public class EnemyProximityBehavior : MonoBehaviour
     private List<GameObject> textObjects;
     public GameObject GoalObject;
     private GameObject playerDebugText;
-    //Renderer rend;
 
     public AStartNavMesh3 AStarNavMesh;
     public NavMesh3 mesh3;
@@ -42,8 +41,8 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     public float speed = 2.0f;
 
-    public float minFleeDist = 5.0f;
-    public float maxFleeDist = 20.0f;
+    //public float minFleeDist = 5.0f;
+    //public float maxFleeDist = 20.0f;
 
     public float maxDistance = 4, moveRandomlyRadius = 3, lookAtPlayerRadius = 2, hideFromPlayerRadius = 1;
 
@@ -170,8 +169,7 @@ public class EnemyProximityBehavior : MonoBehaviour
         GoalObject = new GameObject();
         goalTextMesh = GoalObject.AddComponent<TextMesh>();
         GoalObject.name = "Goal";
-
-        //enemyBody.GetComponent<Renderer>() = this.GetComponent<Renderer>();
+        
         playerDebugText = new GameObject();
         playerDebugText.AddComponent<TextMesh>();
         textObjects = new List<GameObject>();
@@ -181,6 +179,8 @@ public class EnemyProximityBehavior : MonoBehaviour
             textObjects[i].AddComponent<TextMesh>();
             textObjects[i].name = "Debug Radius Line";
         }
+
+        InitializePath();
     }
 
     bool SeesPlayer()
