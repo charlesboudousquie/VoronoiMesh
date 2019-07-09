@@ -229,23 +229,31 @@ public class EnemyProximityBehavior : MonoBehaviour
         // find new state
         //float distance = playerDistanceVar;
         //float distance = Vector3.Distance(player.transform.position, this.transform.position);
-        
+        Color myRandomColor = Color.white;
+        float lowColor = Random.Range(0.0f, 0.3f);
+        float highColor = Random.Range(0.5f, 1.0f);
         if (playerDistanceVar > moveRandomlyRadius)
         {
+            myRandomColor = new Color(lowColor, highColor, lowColor);
             currentState = State.RANDOM_MOVEMENT;
         }
-        else if (playerDistanceVar > lookAtPlayerRadius)
+        else if (playerDistanceVar > lookAtPlayerRadius) 
         {
+            myRandomColor = new Color(lowColor, lowColor, highColor);
             currentState = State.LOOKING;
         }
-        else if (playerDistanceVar > hideFromPlayerRadius)
+        else if (playerDistanceVar > hideFromPlayerRadius) 
         {
+            myRandomColor = new Color(highColor, highColor, lowColor);
             currentState = State.HIDING;
         }
-        else
+        else 
         {
+            myRandomColor = new Color(highColor, lowColor, lowColor);
             currentState = State.FLYING;
         }
+        bmr.material.SetColor("_EmissionColor", myRandomColor);
+        wmr.material.SetColor("_EmissionColor", myRandomColor * .8f);
     }
     void DoStateAction()
     {

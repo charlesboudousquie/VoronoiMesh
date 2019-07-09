@@ -632,8 +632,8 @@ MonoBehaviour:
   maxFleeDist: 4
   maxDistance: 9
   moveRandomlyRadius: 20
-  lookAtPlayerRadius: 2
-  hideFromPlayerRadius: 1
+  lookAtPlayerRadius: 10
+  hideFromPlayerRadius: 5
   wings: {fileID: 209783966}
   bmr: {fileID: 293595719}
   wmr: {fileID: 209783969}
