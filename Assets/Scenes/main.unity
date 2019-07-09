@@ -409,7 +409,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemy: {fileID: 1085192599}
-  numEnemies: 1000
+  numEnemies: 0
 --- !u!4 &339365975
 Transform:
   m_ObjectHideFlags: 0
@@ -452,8 +452,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 351611165}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 17.85, z: -3.077}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalPosition: {x: 0, y: 4, z: 4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 464695799}
   m_Father: {fileID: 0}
@@ -596,7 +596,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1085192604}
   - component: {fileID: 1085192600}
-  - component: {fileID: 1085192606}
   m_Layer: 0
   m_Name: ExampleEnemy
   m_TagString: Untagged
@@ -611,25 +610,26 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1085192599}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d471cae1faa4e41498257394c8b9956d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AStarNavMesh: {fileID: 0}
-  mesh3: {fileID: 0}
+  GoalObject: {fileID: 0}
+  AStarNavMesh: {fileID: 1416185248}
+  mesh3: {fileID: 1416185247}
+  enemyBody: {fileID: 293595717}
+  debugDrawingOn: 1
   scriptEnabled: 1
   randomMovementEnabled: 1
   lookAtPlayerEnabled: 1
   hideFromPlayerEnabled: 1
   flyAwayFromPlayerEnabled: 1
-  speed: 10
-  minFleeDist: 5
-  maxFleeDist: 20
-  maxDistance: 40
-  moveRandomlyRadius: 15
-  lookAtPlayerRadius: 10
-  hideFromPlayerRadius: 5
+  speed: 2
+  maxDistance: 9
+  moveRandomlyRadius: 7
+  lookAtPlayerRadius: 2
+  hideFromPlayerRadius: 1
 --- !u!4 &1085192604
 Transform:
   m_ObjectHideFlags: 0
@@ -646,28 +646,6 @@ Transform:
   m_Father: {fileID: 339365975}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1085192606
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1085192599}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9026193f19b6c4944890df5d8ab007a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  path: []
-  AStarNav: {fileID: 1416185248}
-  navMesh: {fileID: 1416185247}
-  speed: 1
-  index: 0
-  jumpForce: 3
-  jumpDegrade: 0.99
-  mr: {fileID: 293595719}
-  wmr: {fileID: 209783969}
-  wings: {fileID: 209783966}
 --- !u!1 &1416185242
 GameObject:
   m_ObjectHideFlags: 0
@@ -710,7 +688,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1416185242}
-  m_Mesh: {fileID: -2432090755550338912, guid: 95050f9d523232749af23730c2cb274b, type: 3}
+  m_Mesh: {fileID: -2432090755550338912, guid: 527e141531e1bcd41ae8d26a48f35458, type: 3}
 --- !u!114 &1416185245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75379,7 +75357,7 @@ MonoBehaviour:
     Open: 0
     Closed: 0
     Parent: 0
-  ComputeNeighbors: 0
+  ComputeNeighbors: 1
   nodeVisability:
   - 0
   - 0

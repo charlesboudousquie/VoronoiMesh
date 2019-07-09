@@ -59,6 +59,7 @@ public class EnemyProximityBehavior : MonoBehaviour
         goalTextMesh.transform.position = targetNode.Position;
         string currentGoal = "Current Goal: " + currentState.ToString();
         goalTextMesh.text = currentGoal;
+        goalTextMesh.fontSize = 10;
     }
 
     void StopAndLookAtPlayer()
