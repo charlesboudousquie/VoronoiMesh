@@ -409,7 +409,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemy: {fileID: 1085192599}
-  numEnemies: 1000
+  numEnemies: 3000
 --- !u!4 &339365975
 Transform:
   m_ObjectHideFlags: 0
@@ -452,7 +452,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 351611165}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 18.55, z: 4}
+  m_LocalPosition: {x: -5.8, y: 18.55, z: -37.74}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 464695799}
@@ -631,12 +631,13 @@ MonoBehaviour:
   minFleeDist: 1
   maxFleeDist: 4
   maxDistance: 9
-  moveRandomlyRadius: 20
-  lookAtPlayerRadius: 10
-  hideFromPlayerRadius: 5
+  moveRandomlyRadius: 15
+  lookAtPlayerRadius: 12
+  hideFromPlayerRadius: 6
   wings: {fileID: 209783966}
   bmr: {fileID: 293595719}
   wmr: {fileID: 209783969}
+  jumpDecay: 0.99
 --- !u!4 &1085192604
 Transform:
   m_ObjectHideFlags: 0
