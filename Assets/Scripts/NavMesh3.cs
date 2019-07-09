@@ -101,41 +101,28 @@ public class NavMesh3 : MonoBehaviour
             //cam normal and line between cam and node
             //dot product  > 0  within the field of view potentially
             //else not in the field of view 
+            float n = Vector3.Dot(node.normal, line_to_node);
             if (DEBUG_TYPE.NORMALS == debug) {
-                float d = Vector3.Dot(line_to_node, node.normal);
-                if (d < 0) {
-                    d = 0.0f;
-                }
-                Color c =  Color.Lerp(Color.black, Color.magenta, d);
+               
+                float d = (n + 1) / 2;
+                Color c =  new Color(n, n, n);
                 DrawTriangle(node, c);
-            } else if(debug == DEBUG_TYPE.VISABILITY_HIDING)
-            {
-                float d = Vector3.Dot(line_to_node, node.normal);
-                if (d < 0)
-                {
-                    DrawTriangle(node, Color.green);
-                }
-            }
-            if (Vector3.Dot(cam_normal,line_to_node) > 0)
-            {
-                nodeVisability[node.Id] = 0;
-                //move to next node
-                switch (debug)
-                {
-                    case DEBUG_TYPE.VISABILITY_HIDING:
-                        DrawTriangle(node, Color.green);
-                        break;
-                    default:
-                        break;
-                }
+            } 
+            float c_n=  Vector3.Dot(cam_normal, line_to_node);
 
-                continue;
+            nodeVisability[node.Id] = 0;
+            //move to next node
+            if (debug == DEBUG_TYPE.VISABILITY_HIDING)
+            {
+                float cn = (c_n + 1) / 2;
+                DrawTriangle(node, new Color(cn, 1-(n+1)/2, cn));
             }
+            if (c_n > 0)
+                 continue;
 
             //line between cam and node
             //dot product < 0  visable
             //else not visable
-            float n = Vector3.Dot(node.normal, line_to_node);
             nodeVisability[node.Id] = (n + 1) / 2;
             if (debug == DEBUG_TYPE.VISABILITY_POV)
                 DrawTriangle(node, new Color(nodeVisability[node.Id], (1 - nodeVisability[node.Id]),0));
