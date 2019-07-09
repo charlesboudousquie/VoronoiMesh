@@ -60,6 +60,8 @@ public class EnemyProximityBehavior : MonoBehaviour
     public GameObject wings;
     public MeshRenderer bmr, wmr;
 
+    private bool WorkingOnPath;
+
     // depending on the state the goal will be displayed
     // showing what the current objective of the AI is
     void DisplayGoal()
@@ -87,6 +89,9 @@ public class EnemyProximityBehavior : MonoBehaviour
         // get player position
         Vector3 playerPos = player.transform.position;
 
+        lastPosition = AStarNavMesh.GetFurthestNode(playerPos);
+
+        /*
         Vector3 vecToPlayer = playerPos - this.transform.position;
         vecToPlayer.Normalize();
 
@@ -114,6 +119,7 @@ public class EnemyProximityBehavior : MonoBehaviour
                 }
             }
         }
+        */
     }
 
     //VoronoiNode NewRandomPosition()
@@ -163,8 +169,9 @@ public class EnemyProximityBehavior : MonoBehaviour
         {
             lastPosition = mesh3.nodes[RandomIndex()];
             this.transform.position = lastPosition.Position;
-            targetNode = mesh3.nodes[RandomIndex()];
-            SetNewPath();
+            //targetNode = mesh3.nodes[RandomIndex()];
+            //SetNewPath();
+            currentState = State.NONE;
             initialized = true;
         }
     }
@@ -255,6 +262,7 @@ public class EnemyProximityBehavior : MonoBehaviour
         bmr.material.SetColor("_EmissionColor", myRandomColor);
         wmr.material.SetColor("_EmissionColor", myRandomColor * .8f);
     }
+
     void DoStateAction()
     {
         switch (currentState)
@@ -296,6 +304,7 @@ public class EnemyProximityBehavior : MonoBehaviour
         }
         else
         {
+            WorkingOnPath = true;
             pathListIndex = currentPath.Count - 1;
         }
     }
@@ -341,10 +350,23 @@ public class EnemyProximityBehavior : MonoBehaviour
             {
                 wings.SetActive(false);
                 // update current position node
+                
+
                 pathListIndex--;
                 if (pathListIndex == -1)
-                {
+                    {
+                    WorkingOnPath = false;
                     currentState = State.NONE;
+                }
+                else
+                {
+                    //we are pathfinding, but our state has changed, recalc current node and 
+                    EnemyProximityBehavior.State priorState = currentState;
+                    ChangeState();
+                    if (currentState != priorState) {
+                        lastPosition = AStarNavMesh.GetClosestNode(transform.position);
+                        DoStateAction();
+                    }
                 }
             }
         }

@@ -223,6 +223,58 @@ public class AStartNavMesh3 : MonoBehaviour
     }
 
 
+    public VoronoiNode GetFurthestNode(Vector3 position) {
+        VoronoiNode FurthestNode = openHeap.GetNode(0);
+
+        openHeap.ResetHeap();
+        openHeap.Push(0);
+
+        int numCloser = 0;
+        float furthestDist = 10000;
+
+        int MaxNumLoops = 100000;
+        while (!openHeap.IsEmpty() && MaxNumLoops > 0) {
+            MaxNumLoops--;
+            VoronoiNode least = openHeap.Pop();
+            float distToPos = Vector3.SqrMagnitude(least.Position - position);
+
+            if (distToPos > furthestDist) {
+                FurthestNode = least;
+                furthestDist = distToPos;
+                numCloser = 0;
+            } else {
+                numCloser++;
+                if (numCloser > 10) {
+                    return FurthestNode;
+                }
+            }
+
+            //if (request.settings.debugColoring) terrain->set_color(ly, lx, Colors::Blue);
+            int[] neighbors = least.GetNeighbors();
+            for (int i = 0; i < 3; i++) {
+                VoronoiNode nbr = openHeap.GetNode(neighbors[i]);
+                if (!nbr.Closed && !nbr.Open) {
+                    openHeap.SetHeuristic(nbr.Id, 1/distToPos);
+                    openHeap.SetCost(nbr.Id);
+                    openHeap.Push(nbr.Id);
+                    //if (request.settings.debugColoring) terrain->set_color(ny, nx, Colors::Yellow);
+                }
+            }
+            //if (request.settings.singleStep) return PathResult::PROCESSING;
+        }
+
+        if (MaxNumLoops == 0) {
+            Debug.Log("error: exited due to too many iterations in pathfinding loop");
+        } else {
+            Debug.Log("error: no path found");
+        }
+        //handle error: no path exists
+        //return PathResult::IMPOSSIBLE;
+
+        return FurthestNode;
+    }
+
+
     public VoronoiNode GetClosestNode(Vector3 position) {
         VoronoiNode ClosestNode = openHeap.GetNode(0);
 
@@ -364,10 +416,8 @@ public class AStartNavMesh3 : MonoBehaviour
                 linesForSlice = new List<Vector3>();
                 focusNormal = p[i].normal;
                 focusPosition = pointToAdd;
-                //Debug.Log("new point outside of funnel, added to list");
-            } else {
-                //Debug.Log("new point within funnel, continuing");
             }
+
             if (oldPoint != focusPosition && newPoint != focusPosition) {
                 linesForSlice.Add(oldPoint);
                 linesForSlice.Add(newPoint);
