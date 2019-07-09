@@ -15,12 +15,18 @@ public class EnemyProximityBehavior : MonoBehaviour
     //public Rigidbody rb;
     private GameObject player;
     private List<GameObject> textObjects;
-    private GameObject GoalObject;
+    public GameObject GoalObject;
     private GameObject playerDebugText;
-    Renderer rend;
+    //Renderer rend;
 
     public AStartNavMesh3 AStarNavMesh;
     public NavMesh3 mesh3;
+
+    public GameObject enemyBody;
+
+    private bool initialized = false;
+
+    public bool debugDrawingOn = true;
 
     public bool scriptEnabled = true;
     public bool randomMovementEnabled = true;
@@ -41,7 +47,8 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     public float maxDistance = 40, moveRandomlyRadius = 30, lookAtPlayerRadius = 20, hideFromPlayerRadius = 10;
 
-    //int currentPosition;
+    TextMesh goalTextMesh;
+
     int pathListIndex;
     VoronoiNode targetNode;
     List<Vector3> currentPath;
@@ -50,10 +57,9 @@ public class EnemyProximityBehavior : MonoBehaviour
     // showing what the current objective of the AI is
     void DisplayGoal()
     {
-        TextMesh mesh = GoalObject.GetComponent<TextMesh>();
-        mesh.transform.position = targetNode.Position;
+        goalTextMesh.transform.position = targetNode.Position;
         string currentGoal = "Current Goal: " + currentState.ToString();
-        mesh.text = currentGoal;
+        goalTextMesh.text = currentGoal;
     }
 
     //void StopAndLookAtPlayer()
@@ -145,23 +151,27 @@ public class EnemyProximityBehavior : MonoBehaviour
         return mesh3.GetNode(id).Position;
     }
 
+    void InitializePath()
+    {
+        if(AStarNavMesh.readyToPathfind == true)
+        {
+            this.transform.position = mesh3.nodes[RandomIndex()].Position;
+            targetNode = mesh3.nodes[RandomIndex()];
+            SetNewPath();
+            initialized = true;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        //AStarNavMesh = gameObject.GetComponent<AStartNavMesh3>();
-        //mesh3 = gameObject.GetComponent<AStartNavMesh3>().navMesh;
-        this.transform.position = mesh3.nodes[RandomIndex()].Position;
-        targetNode = mesh3.nodes[RandomIndex()];
-        SetNewPath();
-
         player = GameObject.Find("Player");
 
         GoalObject = new GameObject();
-        GoalObject.AddComponent<TextMesh>();
+        goalTextMesh = GoalObject.AddComponent<TextMesh>();
         GoalObject.name = "Goal";
 
-
-        rend = this.GetComponent<Renderer>();
+        //enemyBody.GetComponent<Renderer>() = this.GetComponent<Renderer>();
         playerDebugText = new GameObject();
         playerDebugText.AddComponent<TextMesh>();
         textObjects = new List<GameObject>();
@@ -256,17 +266,19 @@ public class EnemyProximityBehavior : MonoBehaviour
     }
     void SetNewPath()
     {
+        
         // find out what node we are closest to
         VoronoiNode begin = mesh3.GetNode( mesh3.nodes[mesh3.nodes.Length - 1].Position);
 
         if(currentState == State.HIDING)
         {
-            currentPath = AStarNavMesh.GetPathToSafeSpot(begin, 0.5f);
+            currentPath = AStarNavMesh.GetPathToSafeSpot(begin, 0.9f);
         }
         else
         {
             VoronoiNode end = mesh3.GetNode(targetNode.Position);
             currentPath = AStarNavMesh.GetPath(begin, end);
+            pathListIndex = currentPath.Count - 1;
         }
     }
 
@@ -275,8 +287,13 @@ public class EnemyProximityBehavior : MonoBehaviour
     {
         if (scriptEnabled == false) { return; }
 
-        DisplayGoal();
-        DebugDrawing();
+        if(initialized == false) { InitializePath(); return; }
+
+        if(debugDrawingOn == true)
+        {
+            DisplayGoal();
+            DebugDrawing();
+        }
 
         //distance 4: move randomly
         //{ distance 3: stop and look at player }
@@ -295,8 +312,8 @@ public class EnemyProximityBehavior : MonoBehaviour
         if (Vector3.Distance(this.transform.position, currentPath[pathListIndex]) <= epsilon)
         {
             // update current position node
-            pathListIndex++;
-            if (pathListIndex == currentPath.Count)
+            pathListIndex--;
+            if (pathListIndex == -1)
             {
                 currentState = State.NONE;
             }
@@ -325,16 +342,16 @@ public class EnemyProximityBehavior : MonoBehaviour
         Debug.DrawLine(ourPos, ourPos + debugDirection * hideFromPlayerRadius, Color.white);
         DrawDebugDistanceText(hideFromPlayerRadius);
 
-        rend.material.shader = Shader.Find("_Color");
+        //enemyBody.GetComponent<Renderer>().material.shader = Shader.Find("_Color");
         if (SeesPlayer())
         {
             Debug.DrawLine(ourPos, playerPos, Color.red);
-            rend.material.SetColor("_Color", Color.red);
+            enemyBody.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
         }
         else
         {
             Debug.DrawLine(ourPos, playerPos, Color.blue);
-            rend.material.SetColor("_Color", Color.blue);
+            enemyBody.GetComponent<Renderer>().material.SetColor("_Color", Color.blue);
         }
 
         TextMesh playerTextDistance = playerDebugText.GetComponent<TextMesh>();
