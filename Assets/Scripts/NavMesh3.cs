@@ -113,7 +113,7 @@ public class NavMesh3 : MonoBehaviour
                 float d = Vector3.Dot(line_to_node, node.normal);
                 if (d < 0)
                 {
-                    DrawTriangle(node, Color.red);
+                    DrawTriangle(node, Color.green);
                 }
             }
             if (Vector3.Dot(cam_normal,line_to_node) > 0)
@@ -123,7 +123,7 @@ public class NavMesh3 : MonoBehaviour
                 switch (debug)
                 {
                     case DEBUG_TYPE.VISABILITY_HIDING:
-                        DrawTriangle(node, Color.red);
+                        DrawTriangle(node, Color.green);
                         break;
                     default:
                         break;
@@ -136,32 +136,10 @@ public class NavMesh3 : MonoBehaviour
             //dot product < 0  visable
             //else not visable
             float n = Vector3.Dot(node.normal, line_to_node);
-            if ( n > 0)
-            {
-                nodeVisability[node.Id] = 1.0f;
-                switch (debug)
-                {
-                    case DEBUG_TYPE.VISABILITY_POV:
-                        DrawTriangle(node, Color.yellow);
-                        break;
-                    default:
-                        break;
-                }
-                
-            }
-            else
-            {
-                nodeVisability[node.Id] = .5f+n;
-                if (nodeVisability[node.Id] < 0) nodeVisability[node.Id] = 0;
-                switch (debug)
-                {
-                    case DEBUG_TYPE.VISABILITY_POV:
-                        DrawTriangle(node, Color.blue);
-                        break;
-                    default:
-                        break;
-                }
-            }
+            nodeVisability[node.Id] = (n + 1) / 2;
+            if (debug == DEBUG_TYPE.VISABILITY_POV)
+                DrawTriangle(node, new Color(nodeVisability[node.Id], (1 - nodeVisability[node.Id]),0));
+
         }
         //last step invoke in a quarter of a second
         Invoke("UpdateVisability", 0.25f);
@@ -191,9 +169,9 @@ public class NavMesh3 : MonoBehaviour
         nl1 = nl1 * .9f + node.Position;
         Vector3 nl2 = node.vertices[2] - node.Position;
         nl2 = nl2 * .9f + node.Position;
-        Debug.DrawLine(nl0, nl1, c, .25f, false);
-        Debug.DrawLine(nl2, nl0, c, .25f, false);
-        Debug.DrawLine(nl2, nl1, c, .25f, false);
+        Debug.DrawLine(nl0, nl1, c, .25f, true);
+        Debug.DrawLine(nl2, nl0, c, .25f, true);
+        Debug.DrawLine(nl2, nl1, c, .25f, true);
     }
 }
 
