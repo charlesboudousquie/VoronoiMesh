@@ -83,6 +83,68 @@ public class AStartNavMesh3 : MonoBehaviour
         }
     }
 
+    public List<Vector3> GetPathToSafeSpot(VoronoiNode start, float SafetyThreshold) {
+        List<Vector3> path = new List<Vector3>();
+        openHeap.ResetHeap();
+        openHeap.Push(start.Id);
+
+        int MaxNumLoops = 100000;
+        while (!openHeap.IsEmpty() && MaxNumLoops > 0) {
+            MaxNumLoops--;
+            VoronoiNode least = openHeap.Pop();
+
+            if (navMesh.nodeVisability[least.Id] > SafetyThreshold) {
+                int numStops = 1;
+                List<VoronoiNode> nodeList = new List<VoronoiNode>();
+                while (least.Id != start.Id) {
+                    numStops++;
+                    path.Add(least.Position);
+                    nodeList.Add(least);
+                    least = openHeap.GetNode(least.Parent);
+                }
+                nodeList.Add(start);
+                path.Add(start.Position);
+                roughMoves = path;
+
+
+                VoronoiNode[] nodeArr = new VoronoiNode[numStops];
+                int i = 0;
+                foreach (VoronoiNode n in nodeList) {
+                    nodeArr[i] = n;
+                    i++;
+                }
+
+
+                path = GetFunnelPath(nodeArr);
+                smoothMoves = path;
+                //funnel path!!
+                return path;
+            }
+
+            //if (request.settings.debugColoring) terrain->set_color(ly, lx, Colors::Blue);
+            int[] neighbors = least.GetNeighbors();
+            for (int i = 0; i < 3; i++) {
+                VoronoiNode nbr = openHeap.GetNode(neighbors[i]);
+                if (!nbr.Open &&!nbr.Closed) {
+                    openHeap.SetGiven(nbr.Id, least.Id, least.Given + Vector3.Distance(nbr.Position, least.Position));
+                    openHeap.Push(nbr.Id);
+                    //if (request.settings.debugColoring) terrain->set_color(ny, nx, Colors::Yellow);
+                }
+            }
+            //if (request.settings.singleStep) return PathResult::PROCESSING;
+        }
+
+        if (MaxNumLoops == 0) {
+            Debug.Log("error: exited due to too many iterations in pathfinding loop");
+        } else {
+            Debug.Log("error: no path found");
+        }
+        //handle error: no path exists
+        //return PathResult::IMPOSSIBLE;
+
+        return path;
+    }
+
     public List<Vector3> GetPath(VoronoiNode start, VoronoiNode end) {
         List<Vector3> path = new List<Vector3>();
 
