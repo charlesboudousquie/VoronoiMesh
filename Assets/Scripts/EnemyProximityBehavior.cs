@@ -61,18 +61,19 @@ public class EnemyProximityBehavior : MonoBehaviour
         goalTextMesh.text = currentGoal;
     }
 
-    //void StopAndLookAtPlayer()
-    //{
-    //    // get player position
-    //    Vector3 playerPos = player.transform.position;
+    void StopAndLookAtPlayer()
+    {
+        // get player position
+        Vector3 playerPos = player.transform.position;
 
-    //    // make our object look at player
-    //    this.transform.LookAt(playerPos);
+        // make our object look at player
+        this.transform.LookAt(playerPos);
 
-    //    // stop our object
-    //    targetPosition = this.transform.position;
-    //    rb.velocity = new Vector3(0, 0, 0);
-    //}
+        ChangeState();
+        // stop our object
+        //targetPosition = this.transform.position;
+        //rb.velocity = new Vector3(0, 0, 0);
+    }
 
     //void FlyAwayFromPlayer()
     //{
@@ -247,7 +248,7 @@ public class EnemyProximityBehavior : MonoBehaviour
                 //}
                 break;
             case State.LOOKING:
-                //StopAndLookAtPlayer();
+                StopAndLookAtPlayer();
                 break;
             case State.HIDING:
                 // hide from player
@@ -266,13 +267,12 @@ public class EnemyProximityBehavior : MonoBehaviour
     }
     void SetNewPath()
     {
-
         // find out what node we are closest to
         VoronoiNode begin = mesh3.GetNode(mesh3.nodes[mesh3.nodes.Length - 1].Position);
 
         if (currentState == State.HIDING)
         {
-            currentPath = AStarNavMesh.GetPathToSafeSpot(begin, 0.9f);
+            currentPath = AStarNavMesh.GetPathToSafeSpot(begin, 0.1f);
         }
         else
         {
@@ -307,7 +307,7 @@ public class EnemyProximityBehavior : MonoBehaviour
         }
 
         // traverse between our current node and target node
-        if (currentState != State.NONE)
+        if (currentState != State.NONE && currentState != State.LOOKING)
         {
             this.transform.position = Vector3.MoveTowards(this.transform.position, currentPath[pathListIndex], speed * Time.deltaTime);
         }
@@ -359,6 +359,8 @@ public class EnemyProximityBehavior : MonoBehaviour
 
         TextMesh playerTextDistance = playerDebugText.GetComponent<TextMesh>();
         playerTextDistance.text = "Distance to Player: " + Vector3.Distance(playerPos, ourPos).ToString();
+        playerTextDistance.color = Color.red;
+        playerTextDistance.fontSize = 15;
         playerTextDistance.transform.position = (playerPos + ourPos) / 2.0f;
     }
 }
