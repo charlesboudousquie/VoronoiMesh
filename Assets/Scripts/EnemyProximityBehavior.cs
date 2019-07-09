@@ -43,6 +43,7 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     public float speed = 2.0f;
 
+    public float hidingDesire = 0.1f;
     public float minFleeDist = 1.0f;
     public float maxFleeDist = 4.0f;
 
@@ -219,10 +220,10 @@ public class EnemyProximityBehavior : MonoBehaviour
         {
             currentState = State.RANDOM_MOVEMENT;
         }
-        //else if (distance > lookAtPlayerRadius)
-        //{
-        //    currentState = State.LOOKING;
-        //}
+        else if (distance > lookAtPlayerRadius)
+        {
+            currentState = State.LOOKING;
+        }
         else if (distance > hideFromPlayerRadius)
         {
             currentState = State.HIDING;
@@ -241,7 +242,7 @@ public class EnemyProximityBehavior : MonoBehaviour
                 SetNewPath();
                 break;
             case State.LOOKING:
-                //StopAndLookAtPlayer();
+                StopAndLookAtPlayer();
                 break;
             case State.HIDING:
                 // hide from player
@@ -257,13 +258,9 @@ public class EnemyProximityBehavior : MonoBehaviour
     }
     void SetNewPath()
     {
-        // find out what node we are closest to
-        
-        //VoronoiNode begin = mesh3.GetNode(currentPath[0]);
-
         if (currentState == State.HIDING)
         {
-            currentPath = AStarNavMesh.GetPathToSafeSpot(lastPosition, 0.1f, out lastPosition);
+            currentPath = AStarNavMesh.GetPathToSafeSpot(lastPosition, hidingDesire, out lastPosition);
         }
         else
         {
