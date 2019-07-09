@@ -57,6 +57,9 @@ public class EnemyProximityBehavior : MonoBehaviour
     VoronoiNode targetNode;
     List<Vector3> currentPath;
 
+    public GameObject wings;
+    public MeshRenderer bmr, wmr;
+
     // depending on the state the goal will be displayed
     // showing what the current objective of the AI is
     void DisplayGoal()
@@ -78,6 +81,9 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     void FlyAwayFromPlayer()
     {
+
+        wings.SetActive(true);
+
         // get player position
         Vector3 playerPos = player.transform.position;
 
@@ -183,6 +189,14 @@ public class EnemyProximityBehavior : MonoBehaviour
         }
 
         InitializePath();
+
+        
+        speed *= Random.Range(.9f, 1.1f);
+        transform.localScale = transform.localScale * Random.Range(.5f, 1.1f);
+        Color myRandomColor = new Color(0, Random.Range(0.3f, 1.0f), Random.Range(0.3f, 1.0f));
+        bmr.material.SetColor("_EmissionColor", myRandomColor);
+        wmr.material.SetColor("_EmissionColor", myRandomColor * .8f);
+
     }
 
     bool SeesPlayer()
@@ -306,10 +320,18 @@ public class EnemyProximityBehavior : MonoBehaviour
         // traverse between our current node and target node
         if (currentState != State.NONE && currentState != State.LOOKING)
         {
+            
+            Vector3 movementDirection = currentPath[pathListIndex] - transform.position;
+            if (movementDirection != Vector3.zero) {
+                Quaternion rot = Quaternion.LookRotation(movementDirection);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, rot, 100 * Time.deltaTime);
+            }
+            
             this.transform.position = Vector3.MoveTowards(this.transform.position, currentPath[pathListIndex], speed * Time.deltaTime);
 
             if (Vector3.Distance(this.transform.position, currentPath[pathListIndex]) <= epsilon)
             {
+                wings.SetActive(false);
                 // update current position node
                 pathListIndex--;
                 if (pathListIndex == -1)
