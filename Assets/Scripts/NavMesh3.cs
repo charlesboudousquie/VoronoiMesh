@@ -6,6 +6,7 @@ public enum DEBUG_TYPE
 {
     NONE,
     ALL,
+    NORMALS,
     VISABILITY_POV,
     VISABILITY_HIDING,
     PATH,
@@ -100,16 +101,29 @@ public class NavMesh3 : MonoBehaviour
             //cam normal and line between cam and node
             //dot product  > 0  within the field of view potentially
             //else not in the field of view 
-            if (Vector3.Dot(cam_normal,line_to_node) < 0)
+            if (DEBUG_TYPE.NORMALS == debug) {
+                float d = Vector3.Dot(line_to_node, node.normal);
+                if (d < 0) {
+                    d = 0.0f;
+                }
+                Color c =  Color.Lerp(Color.black, Color.magenta, d);
+                DrawTriangle(node, c);
+            } else if(debug == DEBUG_TYPE.VISABILITY_HIDING)
+            {
+                float d = Vector3.Dot(line_to_node, node.normal);
+                if (d < 0)
+                {
+                    DrawTriangle(node, Color.red);
+                }
+            }
+            if (Vector3.Dot(cam_normal,line_to_node) > 0)
             {
                 nodeVisability[node.Id] = 0;
                 //move to next node
                 switch (debug)
                 {
                     case DEBUG_TYPE.VISABILITY_HIDING:
-                        Debug.DrawLine(node.vertices[0] * .9f, node.vertices[1] * .9f, Color.red, .25f, false);
-                        Debug.DrawLine(node.vertices[2] * .9f, node.vertices[0] * .9f, Color.red, .25f, false);
-                        Debug.DrawLine(node.vertices[2] * .9f, node.vertices[1] * .9f, Color.red, .25f, false);
+                        DrawTriangle(node, Color.red);
                         break;
                     default:
                         break;
@@ -121,15 +135,13 @@ public class NavMesh3 : MonoBehaviour
             //line between cam and node
             //dot product < 0  visable
             //else not visable
-            if(Vector3.Dot(node.normal,cam_normal) < 0)
+            if(Vector3.Dot(node.normal,line_to_node) > 0)
             {
                 nodeVisability[node.Id] = 1.0f;
                 switch (debug)
                 {
                     case DEBUG_TYPE.VISABILITY_POV:
-                        Debug.DrawLine(node.vertices[0] * .9f, node.vertices[1] * .9f, Color.yellow, .25f, false);
-                        Debug.DrawLine(node.vertices[2] * .9f, node.vertices[0] * .9f, Color.yellow, .25f, false);
-                        Debug.DrawLine(node.vertices[2] * .9f, node.vertices[1] * .9f, Color.yellow, .25f, false);
+                        DrawTriangle(node, Color.yellow);
                         break;
                     default:
                         break;
@@ -141,10 +153,8 @@ public class NavMesh3 : MonoBehaviour
                 nodeVisability[node.Id] = 0.0f;
                 switch (debug)
                 {
-                    case DEBUG_TYPE.VISABILITY_HIDING:
-                        Debug.DrawLine(node.vertices[0] * .9f, node.vertices[1] * .9f, Color.red, .25f, false);
-                        Debug.DrawLine(node.vertices[2] * .9f, node.vertices[0] * .9f, Color.red, .25f, false);
-                        Debug.DrawLine(node.vertices[2] * .9f, node.vertices[1] * .9f, Color.red, .25f, false);
+                    case DEBUG_TYPE.VISABILITY_POV:
+                        DrawTriangle(node, Color.blue);
                         break;
                     default:
                         break;
@@ -171,5 +181,18 @@ public class NavMesh3 : MonoBehaviour
         }
         return null;
     }
+    private void DrawTriangle(VoronoiNode node, Color c)
+    {
+        Vector3 nl0 = node.vertices[0] - node.Position;
+        nl0 = nl0 * .9f + node.Position;
+        Vector3 nl1 = node.vertices[1] - node.Position;
+        nl1 = nl1 * .9f + node.Position;
+        Vector3 nl2 = node.vertices[2] - node.Position;
+        nl2 = nl2 * .9f + node.Position;
+        Debug.DrawLine(nl0, nl1, c, .25f, true);
+        Debug.DrawLine(nl2, nl0, c, .25f, true);
+        Debug.DrawLine(nl2, nl1, c, .25f, true);
+    }
 }
+
 
