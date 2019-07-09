@@ -59,10 +59,8 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     public GameObject wings;
     public MeshRenderer bmr, wmr;
-
-    private float tempSpeed;
+    
     private Vector3 jumpDirection;
-
     public float jumpDecay;
 
     // depending on the state the goal will be displayed
@@ -88,7 +86,7 @@ public class EnemyProximityBehavior : MonoBehaviour
     {
 
         wings.SetActive(true);
-        jumpDirection = lastPosition.normal * speed;
+        jumpDirection = lastPosition.normal * 2 * speed;
         // get player position
         Vector3 playerPos = player.transform.position;
 
@@ -184,7 +182,7 @@ public class EnemyProximityBehavior : MonoBehaviour
     {
         player = GameObject.Find("Player");
 
-        GoalObject = new GameObject();
+        /*GoalObject = new GameObject();
         goalTextMesh = GoalObject.AddComponent<TextMesh>();
         GoalObject.name = "Goal";
 
@@ -196,7 +194,7 @@ public class EnemyProximityBehavior : MonoBehaviour
             textObjects.Add(new GameObject());
             textObjects[i].AddComponent<TextMesh>();
             textObjects[i].name = "Debug Radius Line";
-        }
+        }*/
 
         InitializePath();
 
@@ -255,6 +253,7 @@ public class EnemyProximityBehavior : MonoBehaviour
         {
             currentState = State.FLYING;
         }
+
         if (currentState != priorState) {
             ChangeMyColor();
         }
