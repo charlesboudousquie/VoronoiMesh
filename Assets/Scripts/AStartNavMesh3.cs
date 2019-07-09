@@ -130,6 +130,7 @@ public class AStartNavMesh3 : MonoBehaviour
                 VoronoiNode nbr = openHeap.GetNode(neighbors[i]);
                 if (!nbr.Open &&!nbr.Closed) {
                     openHeap.SetGiven(nbr.Id, least.Id, least.Given + Vector3.Distance(nbr.Position, least.Position));
+                    openHeap.SetCost(nbr.Id);
                     openHeap.Push(nbr.Id);
                     //if (request.settings.debugColoring) terrain->set_color(ny, nx, Colors::Yellow);
                 }
@@ -196,11 +197,13 @@ public class AStartNavMesh3 : MonoBehaviour
                     float DistToNbr = Vector3.Distance(nbr.Position, least.Position);
                     if (nbr.Given > least.Given + DistToNbr) {
                         openHeap.SetGiven(nbr.Id, least.Id, least.Given + DistToNbr);
+                        openHeap.SetCost(nbr.Id);
                         openHeap.UpdateNode(nbr.Id);
                     }
                 } else if (!nbr.Closed) {
-                    openHeap.SetHeuristic(nbr.Id, least.Given + Vector3.Distance(nbr.Position, least.Position));
+                    openHeap.SetHeuristic(nbr.Id, Vector3.Distance(nbr.Position, end.Position));
                     openHeap.SetGiven(nbr.Id, least.Id, least.Given + Vector3.Distance(nbr.Position, least.Position));
+                    openHeap.SetCost(nbr.Id);
                     openHeap.Push(nbr.Id);
                     //if (request.settings.debugColoring) terrain->set_color(ny, nx, Colors::Yellow);
                 }
@@ -218,6 +221,60 @@ public class AStartNavMesh3 : MonoBehaviour
         
         return path;
     }
+
+
+    public VoronoiNode GetClosestNode(Vector3 position) {
+        VoronoiNode ClosestNode = openHeap.GetNode(0);
+
+        openHeap.ResetHeap();
+        openHeap.Push(0);
+
+        int numFurther = 0;
+        float closestDist = 10000;
+
+        int MaxNumLoops = 100000;
+        while (!openHeap.IsEmpty() && MaxNumLoops > 0) {
+            MaxNumLoops--;
+            VoronoiNode least = openHeap.Pop();
+            float distToPos = Vector3.SqrMagnitude(least.Position - position);
+
+            if (distToPos < closestDist) {
+                ClosestNode = least;
+                closestDist = distToPos;
+                numFurther = 0;
+            } else {
+                numFurther++;
+                if (numFurther > 10) {
+                    return ClosestNode;
+                }
+            }
+
+            //if (request.settings.debugColoring) terrain->set_color(ly, lx, Colors::Blue);
+            int[] neighbors = least.GetNeighbors();
+            for (int i = 0; i < 3; i++) {
+                VoronoiNode nbr = openHeap.GetNode(neighbors[i]);
+                if (!nbr.Closed && !nbr.Open) {
+                    openHeap.SetHeuristic(nbr.Id, distToPos);
+                    openHeap.SetCost(nbr.Id);
+                    openHeap.Push(nbr.Id);
+                    //if (request.settings.debugColoring) terrain->set_color(ny, nx, Colors::Yellow);
+                }
+            }
+            //if (request.settings.singleStep) return PathResult::PROCESSING;
+        }
+
+        if (MaxNumLoops == 0) {
+            Debug.Log("error: exited due to too many iterations in pathfinding loop");
+        } else {
+            Debug.Log("error: no path found");
+        }
+        //handle error: no path exists
+        //return PathResult::IMPOSSIBLE;
+
+        return ClosestNode;
+    }
+
+
 
     public static Vector3 NormRelativeVect(Vector3 nodeCenter, Vector3 nodeNorm, Vector3 pnt) {
         return pnt - (nodeCenter + nodeNorm * Vector3.Dot(pnt - nodeCenter, nodeNorm));
@@ -280,27 +337,20 @@ public class AStartNavMesh3 : MonoBehaviour
         fPath.Add(focusPosition);
 
         for (int i = 1; i < p.Length-1; i++) {
-            //Debug.Log("analyzing " + p[i].Id);
             List<Vector3> priorSharedVerts = p[i-1].GetBorderPoints(p[i]);
-
             Vector3 left = priorSharedVerts[0];
             Vector3 right = priorSharedVerts[1];
 
             if (Vector3.Distance(left, focusPosition) < .01f || Vector3.Distance(right, focusPosition) < .01f) {
-                //Debug.Log("funnel contains corner, skipping");
                 continue;
             }
 
             List<Vector3> sharedVerts = p[i].GetBorderPoints(p[i+1]);
-
-            Vector3 newPoint = Vector3.zero;
-            Vector3 oldPoint = Vector3.zero;
+            Vector3 newPoint = sharedVerts[0];
+            Vector3 oldPoint = sharedVerts[1];
             if (sharedVerts[0] == priorSharedVerts[0] || sharedVerts[0] == priorSharedVerts[1]) {
                 newPoint = sharedVerts[1];
                 oldPoint = sharedVerts[0];
-            } else {
-                newPoint = sharedVerts[0];
-                oldPoint = sharedVerts[1];
             }
 
             bool crossedFunnelBound = true;

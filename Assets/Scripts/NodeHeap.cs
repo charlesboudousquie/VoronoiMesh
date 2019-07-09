@@ -113,11 +113,14 @@ public class NodeHeap
     public void SetGiven(int i, int p, float g) {
         nodeHeap[locationMap[i]].Parent = p;
         nodeHeap[locationMap[i]].Given = g;
-        nodeHeap[locationMap[i]].Cost = nodeHeap[locationMap[i]].Given + nodeHeap[locationMap[i]].Hueristic;
     }
 
     public void SetHeuristic(int i, float h) {
         nodeHeap[locationMap[i]].Hueristic = h;
+    }
+
+    public void SetCost(int i) {
+        nodeHeap[locationMap[i]].Cost = nodeHeap[locationMap[i]].Given + nodeHeap[locationMap[i]].Hueristic;
     }
 
     public VoronoiNode GetNode(int i) {
