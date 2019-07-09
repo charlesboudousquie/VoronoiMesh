@@ -19,7 +19,8 @@ public class EnemyProximityBehavior : MonoBehaviour
     private GameObject playerDebugText;
     Renderer rend;
 
-    NavMesh3 mesh3;
+    public AStartNavMesh3 AStarNavMesh;
+    public NavMesh3 mesh3;
 
     public bool scriptEnabled = true;
     public bool randomMovementEnabled = true;
@@ -29,111 +30,140 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     enum State { NONE, RANDOM_MOVEMENT, LOOKING, HIDING, FLYING };
 
+    float epsilon = 0.001f;
+
     State currentState = State.NONE;
-    private bool stateChanged = false;
 
     public float speed = 10.0f;
 
     public float minFleeDist = 5.0f;
     public float maxFleeDist = 20.0f;
 
-
-    public Timer ActionCoolDowntimer;
-
-
     public float maxDistance = 40, moveRandomlyRadius = 30, lookAtPlayerRadius = 20, hideFromPlayerRadius = 10;
 
-    Vector3 targetPosition;
+    //int currentPosition;
+    int pathListIndex;
+    VoronoiNode targetNode;
+    List<Vector3> currentPath;
 
     // depending on the state the goal will be displayed
     // showing what the current objective of the AI is
     void DisplayGoal()
     {
         TextMesh mesh = GoalObject.GetComponent<TextMesh>();
-        mesh.transform.position = targetPosition;
+        mesh.transform.position = targetNode.Position;
         string currentGoal = "Current Goal: " + currentState.ToString();
         mesh.text = currentGoal;
     }
 
-    void StopAndLookAtPlayer()
+    //void StopAndLookAtPlayer()
+    //{
+    //    // get player position
+    //    Vector3 playerPos = player.transform.position;
+
+    //    // make our object look at player
+    //    this.transform.LookAt(playerPos);
+
+    //    // stop our object
+    //    targetPosition = this.transform.position;
+    //    rb.velocity = new Vector3(0, 0, 0);
+    //}
+
+    //void FlyAwayFromPlayer()
+    //{
+    //    // get player position
+    //    Vector3 playerPos = player.transform.position;
+
+    //    Vector3 vecToPlayer = playerPos - this.transform.position;
+    //    vecToPlayer.Normalize();
+
+    //    // set new destination
+    //    // new destination is a node that is in the opposite direction of the player
+
+    //    // first find random points
+    //    VoronoiNode[] nodes = mesh3.nodes;
+    //    for (int i = 0; i < nodes.Length; i++)
+    //    {
+    //        float distance = Vector3.Distance(nodes[i].Position, playerPos);
+    //        if (distance >= minFleeDist && distance <= maxFleeDist)
+    //        {
+    //            // dot the diff vector with the vector between the node and the enemy
+    //            Vector3 vecToNode = nodes[i].Position - this.transform.position;
+    //            vecToNode.Normalize();
+
+    //            // if node is in opposite direction of player
+    //            // then it is acceptable
+    //            float dotProduct = Vector3.Dot(vecToPlayer, vecToNode);
+    //            if (dotProduct < 0)
+    //            {
+    //                targetPosition = nodes[i].Position;
+    //                return;
+    //            }
+    //        }
+    //    }
+    //}
+
+    //VoronoiNode NewRandomPosition()
+    //{
+    //    // if nodes exist then choose random spot on sphere
+    //    if(mesh3.nodes != null)
+    //    {
+    //        int randomIndex = Random.Range(0, mesh3.nodes.Length - 1);
+    //        return mesh3.nodes[randomIndex];
+    //    }
+    //    return null;
+
+    //    //Vector3 newPos = gameObject.transform.position;
+    //    //newPos.x += Random.Range(-10, 10);
+    //    //newPos.z += Random.Range(-10, 10);
+    //    //return newPos;
+    //}
+
+    int RandomIndex()
     {
-        // get player position
-        Vector3 playerPos = player.transform.position;
-
-        // make our object look at player
-        this.transform.LookAt(playerPos);
-
-        // stop our object
-        targetPosition = this.transform.position;
-        rb.velocity = new Vector3(0, 0, 0);
-    }
-
-    void FlyAwayFromPlayer()
-    {
-        // get player position
-        Vector3 playerPos = player.transform.position;
-
-        Vector3 vecToPlayer = playerPos - this.transform.position;
-        vecToPlayer.Normalize();
-
-        // set new destination
-        // new destination is a node that is in the opposite direction of the player
-
-        // first find random points
-        VoronoiNode[] nodes = mesh3.nodes;
-        for (int i = 0; i < nodes.Length; i++)
-        {
-            float distance = Vector3.Distance(nodes[i].Position, playerPos);
-            if (distance >= minFleeDist && distance <= maxFleeDist)
-            {
-                // dot the diff vector with the vector between the node and the enemy
-                Vector3 vecToNode = nodes[i].Position - this.transform.position;
-                vecToNode.Normalize();
-
-                // if node is in opposite direction of player
-                // then it is acceptable
-                float dotProduct = Vector3.Dot(vecToPlayer, vecToNode);
-                if (dotProduct < 0)
-                {
-                    targetPosition = nodes[i].Position;
-                    return;
-                }
-            }
-        }
-    }
-
-    Vector3 NewRandomPosition()
-    {
-        Vector3 newPos = gameObject.transform.position;
-
-        newPos.x += Random.Range(-10, 10);
-        newPos.z += Random.Range(-10, 10);
-
-        return newPos;
+        return Random.Range(0, mesh3.nodes.Length - 1);
     }
 
     void MoveRandomly()
     {
-        targetPosition = NewRandomPosition();
+        targetNode = mesh3.nodes[ RandomIndex()];
+    }
+
+    VoronoiNode GetClosestNode(Vector3 position)
+    {
+        // todo
+        return mesh3.nodes[0];
+    }
+
+    VoronoiNode GetNode(int id)
+    {
+        return mesh3.GetNode(id);
+    }
+
+    Vector3 GetNodePos(int id)
+    {
+        return mesh3.GetNode(id).Position;
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        ActionCoolDowntimer = new Timer();
+        AStarNavMesh = gameObject.GetComponent<AStartNavMesh3>();
         mesh3 = gameObject.GetComponent<AStartNavMesh3>().navMesh;
+        this.transform.position = mesh3.nodes[RandomIndex()].Position;
+        targetNode = mesh3.nodes[RandomIndex()];
+        SetNewPath();
+
         player = GameObject.Find("Player");
 
         GoalObject = new GameObject();
         GoalObject.AddComponent<TextMesh>();
         GoalObject.name = "Goal";
 
+
+        rend = this.GetComponent<Renderer>();
         playerDebugText = new GameObject();
         playerDebugText.AddComponent<TextMesh>();
-
-        targetPosition = NewRandomPosition();
-        rend = this.GetComponent<Renderer>();
-
         textObjects = new List<GameObject>();
         for (int i = 0; i < 4; i++)
         {
@@ -194,61 +224,85 @@ public class EnemyProximityBehavior : MonoBehaviour
         {
             currentState = State.FLYING;
         }
-
-        // determine if state changed
-        if (currentState != previousState)
-        {
-            stateChanged = true;
-        }
-        else
-        {
-            stateChanged = false;
-        }
     }
     void DoStateAction()
     {
         switch (currentState)
         {
             case State.RANDOM_MOVEMENT:
-                if (ActionCoolDowntimer.LimitReached())
-                {
-                    MoveRandomly();
-                    ActionCoolDowntimer.Reset();
-                }
+                //if (ActionCoolDowntimer.LimitReached())
+                //{
+                MoveRandomly();
+                //ActionCoolDowntimer.Reset();
+                //}
                 break;
             case State.LOOKING:
-                StopAndLookAtPlayer();
+                //StopAndLookAtPlayer();
                 break;
             case State.HIDING:
                 // hide from player
-                ActionCoolDowntimer.Reset();
+                //ActionCoolDowntimer.Reset();
                 break;
             case State.FLYING:
-                if (ActionCoolDowntimer.LimitReached())
-                {
-                    FlyAwayFromPlayer();
-                    ActionCoolDowntimer.Reset();
-                }
+                //if (ActionCoolDowntimer.LimitReached())
+                //{
+                //FlyAwayFromPlayer();
+                //ActionCoolDowntimer.Reset();
+                //}
                 break;
             default:
                 break;
         }
     }
+    void SetNewPath()
+    {
+        // find out what node we are closest to
+        VoronoiNode start = GetClosestNode(this.transform.position);
+        VoronoiNode end = GetClosestNode(targetNode.Position);
+        currentPath = AStarNavMesh.GetPath(start, end);
+    }
 
     // Update is called once per frame
     void Update()
     {
-        if (scriptEnabled == false)
-        {
-            return;
-        }
+        if (scriptEnabled == false) { return; }
 
         DisplayGoal();
-        
+        DebugDrawing();
+
+        //distance 4: move randomly
+        //{ distance 3: stop and look at player }
+        //distance 2: move away from player until obscured
+        //{ distance 1: fly away from player }
+        if (currentState == State.NONE)
+        {
+            ChangeState();
+            DoStateAction();
+            SetNewPath();
+        }
+
+        // traverse between our current node and target node
+        this.transform.position = Vector3.MoveTowards(this.transform.position, currentPath[pathListIndex], speed * Time.deltaTime);
+
+        if (Vector3.Distance(this.transform.position, currentPath[pathListIndex]) <= epsilon)
+        {
+            // update current position node
+            pathListIndex++;
+            if (pathListIndex == currentPath.Count)
+            {
+                currentState = State.NONE;
+            }
+        }
+    }
+
+    void DebugDrawing()
+    {
         Vector3 ourPos = this.transform.position;
-        Vector3 debugDirection = new Vector3(0.0f, 0.0f, 1.0f);
         Vector3 forwardVector = this.transform.forward;
         Debug.DrawLine(ourPos, ourPos + 5 * forwardVector, Color.black);
+
+        Vector3 debugDirection = new Vector3(0.0f, 0.0f, 1.0f);
+        Vector3 playerPos = player.transform.position;
 
         // draw debug lines
         Debug.DrawLine(ourPos, ourPos + debugDirection * maxDistance, Color.green);
@@ -262,17 +316,6 @@ public class EnemyProximityBehavior : MonoBehaviour
 
         Debug.DrawLine(ourPos, ourPos + debugDirection * hideFromPlayerRadius, Color.white);
         DrawDebugDistanceText(hideFromPlayerRadius);
-        
-        Vector3 playerPos = player.transform.position;
-
-        ChangeState();
-        // 4 cases
-        //distance 4: move randomly
-        //{ distance 3: stop and look at player }
-        //distance 2: move away from player until obscured
-        //{ distance 1: fly away from player }
-        DoStateAction();
-        gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, targetPosition, speed * Time.deltaTime);
 
         rend.material.shader = Shader.Find("_Color");
         if (SeesPlayer())
@@ -285,8 +328,10 @@ public class EnemyProximityBehavior : MonoBehaviour
             Debug.DrawLine(ourPos, playerPos, Color.blue);
             rend.material.SetColor("_Color", Color.blue);
         }
+
         TextMesh playerTextDistance = playerDebugText.GetComponent<TextMesh>();
         playerTextDistance.text = "Distance to Player: " + Vector3.Distance(playerPos, ourPos).ToString();
         playerTextDistance.transform.position = (playerPos + ourPos) / 2.0f;
     }
 }
+
