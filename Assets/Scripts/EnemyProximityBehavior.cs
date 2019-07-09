@@ -43,6 +43,7 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     public float speed = 2.0f;
 
+    public float hidingDesire = 0.1f;
     public float minFleeDist = 1.0f;
     public float maxFleeDist = 4.0f;
 
@@ -212,18 +213,18 @@ public class EnemyProximityBehavior : MonoBehaviour
     void ChangeState()
     {
         // find new state
-        float distance = playerDistanceVar;
+        //float distance = playerDistanceVar;
         //float distance = Vector3.Distance(player.transform.position, this.transform.position);
         
-        if (distance > moveRandomlyRadius)
+        if (playerDistanceVar > moveRandomlyRadius)
         {
             currentState = State.RANDOM_MOVEMENT;
         }
-        //else if (distance > lookAtPlayerRadius)
-        //{
-        //    currentState = State.LOOKING;
-        //}
-        else if (distance > hideFromPlayerRadius)
+        else if (playerDistanceVar > lookAtPlayerRadius)
+        {
+            currentState = State.LOOKING;
+        }
+        else if (playerDistanceVar > hideFromPlayerRadius)
         {
             currentState = State.HIDING;
         }
@@ -241,10 +242,9 @@ public class EnemyProximityBehavior : MonoBehaviour
                 SetNewPath();
                 break;
             case State.LOOKING:
-                //StopAndLookAtPlayer();
+                StopAndLookAtPlayer();
                 break;
             case State.HIDING:
-                // hide from player
                 SetNewPath();
                 break;
             case State.FLYING:
@@ -257,13 +257,9 @@ public class EnemyProximityBehavior : MonoBehaviour
     }
     void SetNewPath()
     {
-        // find out what node we are closest to
-        
-        //VoronoiNode begin = mesh3.GetNode(currentPath[0]);
-
         if (currentState == State.HIDING)
         {
-            currentPath = AStarNavMesh.GetPathToSafeSpot(lastPosition, 0.1f, out lastPosition);
+            currentPath = AStarNavMesh.GetPathToSafeSpot(lastPosition, hidingDesire, out lastPosition);
         }
         else
         {
@@ -287,6 +283,8 @@ public class EnemyProximityBehavior : MonoBehaviour
     {
         if (scriptEnabled == false) { return; }
         if (initialized == false) { InitializePath(); return; }
+        playerDistanceVar = Vector3.Distance(this.transform.position, player.transform.position);
+
         if (debugDrawingOn == true)
         {
             DisplayGoal();
@@ -294,7 +292,6 @@ public class EnemyProximityBehavior : MonoBehaviour
         }
 
         // UNCOMMENT THIS WHEN DONE
-        //playerDistanceVar = Vector3.Distance(this.transform.position, player.transform.position);
 
         //distance 4: move randomly
         //{ distance 3: stop and look at player }
