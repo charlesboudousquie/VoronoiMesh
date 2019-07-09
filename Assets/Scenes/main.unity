@@ -409,7 +409,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemy: {fileID: 1085192599}
-  numEnemies: 5000
+  numEnemies: 1000
 --- !u!4 &339365975
 Transform:
   m_ObjectHideFlags: 0
@@ -616,7 +616,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d471cae1faa4e41498257394c8b9956d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
+  AStarNavMesh: {fileID: 0}
+  mesh3: {fileID: 0}
+  scriptEnabled: 1
+  randomMovementEnabled: 1
+  lookAtPlayerEnabled: 1
+  hideFromPlayerEnabled: 1
+  flyAwayFromPlayerEnabled: 1
+  speed: 10
+  minFleeDist: 5
+  maxFleeDist: 20
+  maxDistance: 40
   moveRandomlyRadius: 15
   lookAtPlayerRadius: 10
   hideFromPlayerRadius: 5
@@ -84696,6 +84706,7 @@ MonoBehaviour:
   - 592.56995
   - 366.85962
   - 386.9179
+  debug: 0
 --- !u!114 &1416185248
 MonoBehaviour:
   m_ObjectHideFlags: 0

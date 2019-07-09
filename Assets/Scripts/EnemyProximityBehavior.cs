@@ -15,7 +15,7 @@ public class EnemyProximityBehavior : MonoBehaviour
     //public Rigidbody rb;
     private GameObject player;
     private List<GameObject> textObjects;
-    private GameObject GoalObject;
+    public GameObject GoalObject;
     private GameObject playerDebugText;
     Renderer rend;
 

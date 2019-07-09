@@ -30,9 +30,11 @@ public class FollowPath : MonoBehaviour
 
     void MoveTo(Vector3 goal)
     {
-        
-        Quaternion rot = Quaternion.LookRotation(goal - transform.position);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, rot, 100 * Time.deltaTime);
+        Vector3 movementDirection = goal - transform.position;
+        if (movementDirection != Vector3.zero) {
+            Quaternion rot = Quaternion.LookRotation(goal - transform.position);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, rot, 100 * Time.deltaTime);
+        }
 
         if (waitTime <= 0) {
             gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, goal, (speed + TempSpeed) * Time.deltaTime) + jumpDirection * Time.deltaTime;
