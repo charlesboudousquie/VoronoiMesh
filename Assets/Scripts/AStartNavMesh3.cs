@@ -95,7 +95,7 @@ public class AStartNavMesh3 : MonoBehaviour
             MaxNumLoops--;
             VoronoiNode least = openHeap.Pop();
 
-            if (navMesh.nodeVisability[least.Id] > SafetyThreshold) {
+            if (navMesh.nodeVisability[least.Id] < SafetyThreshold) {
                 int numStops = 1;
                 List<VoronoiNode> nodeList = new List<VoronoiNode>();
                 while (least.Id != start.Id) {
