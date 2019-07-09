@@ -86,7 +86,7 @@ public class AStartNavMesh3 : MonoBehaviour
     public List<Vector3> GetPathToSafeSpot(VoronoiNode start, float SafetyThreshold) {
         List<Vector3> path = new List<Vector3>();
 
-        if (navMesh.nodeVisability[start.Id] > SafetyThreshold) return path;
+        if (navMesh.nodeVisability[start.Id] < SafetyThreshold) return path;
         openHeap.ResetHeap();
         openHeap.Push(start.Id);
 
