@@ -189,9 +189,9 @@ public class NavMesh3 : MonoBehaviour
         nl1 = nl1 * .9f + node.Position;
         Vector3 nl2 = node.vertices[2] - node.Position;
         nl2 = nl2 * .9f + node.Position;
-        Debug.DrawLine(nl0, nl1, c, .25f, true);
-        Debug.DrawLine(nl2, nl0, c, .25f, true);
-        Debug.DrawLine(nl2, nl1, c, .25f, true);
+        Debug.DrawLine(nl0, nl1, c, .25f, false);
+        Debug.DrawLine(nl2, nl0, c, .25f, false);
+        Debug.DrawLine(nl2, nl1, c, .25f, false);
     }
 }
 
