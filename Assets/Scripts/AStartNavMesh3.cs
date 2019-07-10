@@ -37,8 +37,8 @@ public class AStartNavMesh3 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        DrawPath(smoothMoves, Color.red);
-        DrawPath(roughMoves, Color.green);
+        DrawPath(smoothMoves, Color.green);
+        DrawPath(roughMoves, Color.red);
     }
 
     private void DrawPath(List<Vector3> p, Color c) {
@@ -55,8 +55,9 @@ public class AStartNavMesh3 : MonoBehaviour
     }
 
     public List<Vector3> GetPathToSafeSpot(VoronoiNode start, float SafetyThreshold, out VoronoiNode safeSpot) {
+        List<Vector3> path = new List<Vector3>();
         safeSpot = start;
-        if (navMesh.nodeVisability[start.Id] < SafetyThreshold) return new List<Vector3>();
+        if (navMesh.nodeVisability[start.Id] < SafetyThreshold) return path;
         openHeap.ResetHeap();
         openHeap.Push(start.Id);
 
@@ -69,15 +70,16 @@ public class AStartNavMesh3 : MonoBehaviour
                 safeSpot = least;
                 int numStops = 1;
                 List<VoronoiNode> nodeList = new List<VoronoiNode>();
-                roughMoves = new List<Vector3>();
                 while (least.Id != start.Id) {
                     numStops++;
-                    roughMoves.Add(least.Position);
+                    path.Add(least.Position);
                     nodeList.Add(least);
                     least = openHeap.GetNode(least.Parent);
                 }
                 nodeList.Add(start);
-                roughMoves.Add(start.Position);
+                path.Add(start.Position);
+                roughMoves = path;
+
 
                 VoronoiNode[] nodeArr = new VoronoiNode[numStops];
                 int i = 0;
@@ -85,8 +87,11 @@ public class AStartNavMesh3 : MonoBehaviour
                     nodeArr[i] = n;
                     i++;
                 }
-                smoothMoves = GetFunnelPath(nodeArr);
-                return smoothMoves;
+
+
+                path = GetFunnelPath(nodeArr);
+                smoothMoves = path;
+                return path;
             }
             
             int[] neighbors = least.GetNeighbors();
@@ -106,12 +111,13 @@ public class AStartNavMesh3 : MonoBehaviour
             Debug.Log("error: no path found");
         }
 
-        return new List<Vector3>();
+        return path;
     }
 
     public List<Vector3> GetPath(VoronoiNode start, VoronoiNode end) {
+        List<Vector3> path = new List<Vector3>();
 
-        if (start.Id == end.Id) return new List<Vector3>();
+        if (start.Id == end.Id) return path;
         openHeap.ResetHeap();
         openHeap.Push(start.Id);
 
@@ -125,25 +131,29 @@ public class AStartNavMesh3 : MonoBehaviour
                 List<VoronoiNode> nodeList = new List<VoronoiNode>();
                 while (least.Id != start.Id) {
                     numStops++;
-                    roughMoves.Add(least.Position);
+                    path.Add(least.Position);
                     nodeList.Add(least);
                     least = openHeap.GetNode(least.Parent);
                 }
                 nodeList.Add(start);
-                roughMoves.Add(start.Position);
-                
+                path.Add(start.Position);
+                roughMoves = path;
+
+
                 VoronoiNode[] nodeArr = new VoronoiNode[numStops];
                 int i = 0;
                 foreach (VoronoiNode n in nodeList) {
                     nodeArr[i] = n;
                     i++;
                 }
-                
-                smoothMoves = GetFunnelPath(nodeArr);
-                return smoothMoves;
-            }
 
-            //if (request.settings.debugColoring) terrain->set_color(ly, lx, Colors::Blue);
+
+                path = GetFunnelPath(nodeArr);
+                smoothMoves = path;
+                //funnel path!!
+                return path;
+            }
+            
             int[] neighbors = least.GetNeighbors();
             for (int i = 0; i < 3; i++) {
                 VoronoiNode nbr = openHeap.GetNode(neighbors[i]);
@@ -168,8 +178,8 @@ public class AStartNavMesh3 : MonoBehaviour
         } else {
             Debug.Log("error: no path found");
         }
-
-        return new List<Vector3>();
+        
+        return path;
     }
 
 
@@ -255,7 +265,9 @@ public class AStartNavMesh3 : MonoBehaviour
 
         return ClosestNode;
     }
-    
+
+
+
     public static Vector3 NormRelativeVect(Vector3 nodeCenter, Vector3 nodeNorm, Vector3 pnt) {
         return pnt - (nodeCenter + nodeNorm * Vector3.Dot(pnt - nodeCenter, nodeNorm));
     }
@@ -299,6 +311,7 @@ public class AStartNavMesh3 : MonoBehaviour
             calculate = !calculate;
         }
         
+
         outputPath.Add(endPos);
     }
 
