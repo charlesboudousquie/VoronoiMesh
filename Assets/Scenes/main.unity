@@ -409,7 +409,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemy: {fileID: 1085192599}
-  numEnemies: 1000
+  numEnemies: 0
 --- !u!4 &339365975
 Transform:
   m_ObjectHideFlags: 0
@@ -615,29 +615,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d471cae1faa4e41498257394c8b9956d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GoalObject: {fileID: 0}
+  player: {fileID: 351611165}
+  enemyBody: {fileID: 293595717}
+  wings: {fileID: 209783966}
   AStarNavMesh: {fileID: 1416185248}
   mesh3: {fileID: 1416185247}
-  enemyBody: {fileID: 293595717}
-  playerDistanceVar: 0
-  debugDrawingOn: 0
-  scriptEnabled: 1
-  randomMovementEnabled: 1
-  lookAtPlayerEnabled: 1
-  hideFromPlayerEnabled: 1
-  flyAwayFromPlayerEnabled: 1
+  RandomVariation: 0.1
   speed: 2
+  rotSpeed: 100
   hidingDesire: 0.1
-  minFleeDist: 1
-  maxFleeDist: 4
-  maxDistance: 9
-  moveRandomlyRadius: 15
-  lookAtPlayerRadius: 12
-  hideFromPlayerRadius: 6
-  wings: {fileID: 209783966}
+  jumpDecay: 0.99
+  moveRandomlyRadius: 225
+  lookAtPlayerRadius: 144
+  hideFromPlayerRadius: 15
   bmr: {fileID: 293595719}
   wmr: {fileID: 209783969}
-  jumpDecay: 0.99
 --- !u!4 &1085192604
 Transform:
   m_ObjectHideFlags: 0
