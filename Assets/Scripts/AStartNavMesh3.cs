@@ -54,10 +54,72 @@ public class AStartNavMesh3 : MonoBehaviour
         }
     }
 
+
+    public List<Vector3> GetSafeRandomPath(VoronoiNode start, float SafetyThreshold, out VoronoiNode safeSpot) {
+        List<Vector3> path = new List<Vector3>();
+
+        openHeap.ResetHeap();
+        openHeap.Push(start.Id);
+
+        int MaxNumLoops = 5;
+        while (!openHeap.IsEmpty()) {
+            MaxNumLoops--;
+            VoronoiNode least = openHeap.Pop();
+
+            if (MaxNumLoops < 0) {
+                safeSpot = least;
+                int numStops = 1;
+                List<VoronoiNode> nodeList = new List<VoronoiNode>();
+                while (least.Id != start.Id) {
+                    numStops++;
+                    path.Add(least.Position);
+                    nodeList.Add(least);
+                    least = openHeap.GetNode(least.Parent);
+                }
+                nodeList.Add(start);
+                path.Add(start.Position);
+                roughMoves = path;
+
+
+                VoronoiNode[] nodeArr = new VoronoiNode[numStops];
+                int i = 0;
+                foreach (VoronoiNode n in nodeList) {
+                    nodeArr[i] = n;
+                    i++;
+                }
+
+
+                path = GetFunnelPath(nodeArr);
+                smoothMoves = path;
+                return path;
+            }
+
+            int[] neighbors = least.GetNeighbors();
+            for (int i = 0; i < 3; i++) {
+                VoronoiNode nbr = openHeap.GetNode(neighbors[i]);
+                if (!nbr.Open && !nbr.Closed) {
+                    float nbrSafety = 1-(navMesh.distanceFromPlayer[nbr.Id]/navMesh.maxDistanceFromPlayer);
+                    openHeap.SetGiven(nbr.Id, least.Id, nbrSafety);
+                    openHeap.SetCost(nbr.Id);
+                    openHeap.Push(nbr.Id);
+                }
+            }
+        }
+
+        safeSpot = start;
+        return path;
+    }
+
+
     public List<Vector3> GetPathToSafeSpot(VoronoiNode start, float SafetyThreshold, out VoronoiNode safeSpot) {
         List<Vector3> path = new List<Vector3>();
         safeSpot = start;
-        if (navMesh.nodeVisability[start.Id] < SafetyThreshold) return path;
+        if (navMesh.nodeVisability[start.Id] < SafetyThreshold) {
+            VoronoiNode ss;
+            path = GetSafeRandomPath(start, SafetyThreshold, out ss);
+            safeSpot = ss;
+            return path;
+        }
         openHeap.ResetHeap();
         openHeap.Push(start.Id);
 
@@ -98,7 +160,8 @@ public class AStartNavMesh3 : MonoBehaviour
             for (int i = 0; i < 3; i++) {
                 VoronoiNode nbr = openHeap.GetNode(neighbors[i]);
                 if (!nbr.Open &&!nbr.Closed) {
-                    openHeap.SetGiven(nbr.Id, least.Id, least.Given + Vector3.Distance(nbr.Position, least.Position));
+                    float nbrVisibility = navMesh.nodeVisability[nbr.Id];
+                    openHeap.SetGiven(nbr.Id, least.Id, least.Given + nbrVisibility * Vector3.Distance(nbr.Position, least.Position));
                     openHeap.SetCost(nbr.Id);
                     openHeap.Push(nbr.Id);
                 }

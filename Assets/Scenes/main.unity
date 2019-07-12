@@ -614,8 +614,8 @@ MonoBehaviour:
   rotSpeed: 100
   hidingDesire: 0.1
   jumpDecay: 0.99
-  moveRandomlyRadius: 225
-  lookAtPlayerRadius: 144
+  moveRandomlyRadius: 180
+  lookAtPlayerRadius: 140
   hideFromPlayerRadius: 15
   bmr: {fileID: 293595719}
   wmr: {fileID: 209783969}
@@ -84673,6 +84673,7 @@ MonoBehaviour:
   - 592.56995
   - 366.85962
   - 386.9179
+  maxDistanceFromPlayer: 0
   debug: 0
 --- !u!114 &1416185248
 MonoBehaviour:

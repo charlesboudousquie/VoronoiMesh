@@ -24,15 +24,35 @@ public class EnemyProximityBehavior : MonoBehaviour
     private VoronoiNode targetNode;
     private List<Vector3> currentPath;
     private Vector3 jumpDirection;
-    
+    private Color SafeColor, LookColor, HideColor, FlyColor;
+    private int numTimesToStop;
 
     void StopAndLookAtPlayer()
     {
         // get player position
-        Vector3 playerPos = player.transform.position;
-
+        numTimesToStop = Random.Range(4, 10);
         // make our object look at player
-        this.transform.LookAt(playerPos);
+        CheckIfStillInView();
+    }
+
+    void CheckIfStillInView() {
+        if (currentState == State.LOOKING) {
+            Vector3 playerPos = player.transform.position;
+            this.transform.LookAt(playerPos);
+            ChangeState();
+            if (currentState != State.LOOKING) {
+                DoStateAction();
+            } else {
+                numTimesToStop--;
+                if (numTimesToStop < 0) {
+                    currentState = State.RANDOM_MOVEMENT;
+                    currentPath = AStarNavMesh.GetSafeRandomPath(lastPosition, hidingDesire, out lastPosition);
+                    CheckForBadPath();
+                } else {
+                    Invoke("CheckIfStillInView", .5f);
+                }
+            }
+        }
     }
 
     void FlyAwayFromPlayer()
@@ -76,7 +96,15 @@ public class EnemyProximityBehavior : MonoBehaviour
         lookAtPlayerRadius *= Random.Range(1 - RandomVariation, 1 + RandomVariation);
         hideFromPlayerRadius *= Random.Range(1 - RandomVariation, 1 + RandomVariation);
 
-    }
+        float lowColor1 = Random.Range(0.0f, 0.5f);
+        float highColor1 = Random.Range(0.5f, 1.0f);
+        float lowColor2 = Random.Range(0.0f, 0.5f);
+        float highColor2 = Random.Range(0.5f, 1.0f);
+        SafeColor = new Color(lowColor1, highColor1, lowColor2);
+        LookColor = new Color(lowColor1, lowColor2, highColor1);
+        HideColor = new Color(highColor1, highColor2, lowColor1);
+        FlyColor = new Color(highColor1, lowColor1, lowColor2);
+        }
 
     void ChangeState()
     {
@@ -106,22 +134,18 @@ public class EnemyProximityBehavior : MonoBehaviour
 
     void ChangeMyColor() {
         Color myRandomColor = Color.white;
-        float lowColor1 = Random.Range(0.0f, 0.5f);
-        float highColor1 = Random.Range(0.5f, 1.0f);
-        float lowColor2 = Random.Range(0.0f, 0.5f);
-        float highColor2 = Random.Range(0.5f, 1.0f);
         switch (currentState) {
             case (State.RANDOM_MOVEMENT):
-                myRandomColor = new Color(lowColor1, highColor1, lowColor2);
+                myRandomColor = SafeColor;
                 break;
             case (State.LOOKING):
-                myRandomColor = new Color(lowColor1, lowColor2, highColor1);
+                myRandomColor = LookColor;
                 break;
             case (State.HIDING):
-                myRandomColor = new Color(highColor1, highColor2, lowColor1);
+                myRandomColor = HideColor;
                 break;
             case (State.FLYING):
-                myRandomColor = new Color(highColor1, lowColor1, lowColor2);
+                myRandomColor = FlyColor;
                 break;
             default:
                 break;
@@ -167,7 +191,7 @@ public class EnemyProximityBehavior : MonoBehaviour
         if (currentPath.Count == 0) {
             currentState = State.NONE;
         } else {
-            pathListIndex = currentPath.Count - 1;
+            pathListIndex = currentPath.Count - 2;
         }
     }
 
@@ -176,12 +200,12 @@ public class EnemyProximityBehavior : MonoBehaviour
     {
         if (initialized == false) { InitializePath(); return; }
 
-        if (currentState == State.NONE || currentState == State.LOOKING)
+        if (currentState == State.NONE)
         {
             ChangeState();
             DoStateAction();
         }
-        else
+        else if (currentState != State.LOOKING)
         {
             Vector3 movementDirection = currentPath[pathListIndex] - transform.position;
             if (movementDirection != Vector3.zero) {

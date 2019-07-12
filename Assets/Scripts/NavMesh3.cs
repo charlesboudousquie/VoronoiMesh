@@ -19,6 +19,7 @@ public class NavMesh3 : MonoBehaviour
     public bool ComputeNeighbors;
     public float[] nodeVisability;
     public float[] distanceFromPlayer;
+    public float maxDistanceFromPlayer;
     public DEBUG_TYPE debug;
 
     void Start()
@@ -91,10 +92,14 @@ public class NavMesh3 : MonoBehaviour
         Vector3 cam_normal = cam.transform.forward.normalized;
         Vector3 cam_pos = cam.transform.position;
         float degrees_fov = cam.fieldOfView;
-        foreach(VoronoiNode node in nodes)
+        maxDistanceFromPlayer = 0;
+        foreach (VoronoiNode node in nodes)
         {
             float dis_sq = Vector3.SqrMagnitude(cam_pos-node.Position);
             distanceFromPlayer[node.Id] = dis_sq;
+            if (maxDistanceFromPlayer < dis_sq) {
+                maxDistanceFromPlayer = dis_sq;
+            }
 
             Vector3 line_to_node = cam_pos - node.Position;
             line_to_node = line_to_node.normalized;
@@ -137,6 +142,7 @@ public class NavMesh3 : MonoBehaviour
         return nodes[_id];
     }
 
+    
     public VoronoiNode GetNode(Vector3 position)
     {
         foreach (VoronoiNode vN in nodes)
@@ -148,6 +154,7 @@ public class NavMesh3 : MonoBehaviour
         }
         return null;
     }
+    
     private void DrawTriangle(VoronoiNode node, Color c)
     {
         Vector3 nl0 = node.vertices[0] - node.Position;
