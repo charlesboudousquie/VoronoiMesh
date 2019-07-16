@@ -7,7 +7,7 @@ public class AStartNavMesh3 : MonoBehaviour
     NodeHeap openHeap;
     public NavMesh3 navMesh;
     List<Vector3> moves;
-    List<Vector3> smoothMoves, roughMoves;
+    List<Vector3> smoothMoves, roughMoves, funneledMoves;
     public bool readyToPathfind = false;
 
     // Start is called before the first frame update
@@ -17,6 +17,7 @@ public class AStartNavMesh3 : MonoBehaviour
         moves = new List<Vector3>();
         smoothMoves = new List<Vector3>();
         roughMoves = new List<Vector3>();
+        funneledMoves = new List<Vector3>();
         if (openHeap == null) {
             openHeap = new NodeHeap();
         }
