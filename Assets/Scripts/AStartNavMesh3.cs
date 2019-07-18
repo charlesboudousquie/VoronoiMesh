@@ -368,6 +368,9 @@ public class AStartNavMesh3 : MonoBehaviour
                 float denominator = Vector3.Dot(lineDirection, sliceNormal);
                 if (denominator != 0 && numerator != 0) {
                     Vector3 intersection = PointOnLine + lineDirection.normalized * (numerator/denominator);
+                    if (intersection.y > 36) {
+                        intersection.y = 36;
+                    }
                     outputPath.Add(intersection);
                 }
             }
